@@ -1,0 +1,2 @@
+/home/rishi/mydev/books/myfs_book/lkw/doc/02_basics_of_kernel_programming/code/mycalc/mycalc.ko
+/home/rishi/mydev/books/myfs_book/lkw/doc/02_basics_of_kernel_programming/code/mycalc/mycalc.o

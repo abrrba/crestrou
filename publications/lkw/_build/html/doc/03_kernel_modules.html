@@ -1,0 +1,1547 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Kernel Modules &#8212; Linux Kernel Workbook 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../_static/cloud.js"></script>
+    <link rel="top" title="Linux Kernel Workbook 1.0 documentation" href="../wip.index.html" />
+    <link rel="next" title="1. EXPORT_SYMBOL" href="04_exporting_symbols.html" />
+    <link rel="prev" title="3. Kernel Compilation" href="02_kernel_compilation.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="04_exporting_symbols.html" title="1. EXPORT_SYMBOL"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="02_kernel_compilation.html" title="3. Kernel Compilation"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="../index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kernel-modules">
+<h1>4. Kernel Modules<a class="headerlink" href="#kernel-modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>4.1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>We generally do not make changes directly to the core kernel code. We mostly
+write small modules to be added to the kernel. This way we can separate out our
+changes from the mainline kernel.</p>
+<p>If you see - the file system are thus modules only, as not all the linux
+installations do not need all the file systems and the user can load them on
+demand.</p>
+<p>In this chapter we will see how to write kernel modules.</p>
+<div class="section" id="why-this-chapter">
+<h3>4.1.1. Why this chapter<a class="headerlink" href="#why-this-chapter" title="Permalink to this headline">¶</a></h3>
+<p>This chapter is the most important building block of the whole document. So
+spend some time with it. Do not just copy paste the code.</p>
+<p>Type the code and then run it. Read the comments and type them as well so as to
+understand what the comments mean.</p>
+<p>The more time you spend here - the lesser time you will spend later.</p>
+</div>
+<div class="section" id="what-will-you-learn">
+<h3>4.1.2. What will you learn<a class="headerlink" href="#what-will-you-learn" title="Permalink to this headline">¶</a></h3>
+<p>We will learn</p>
+<ul class="simple">
+<li>How to write a basic kernel module.</li>
+<li>How to write functions and make it available to other modules. Sort of library.</li>
+<li>How to pass parameters to the modules which is getting loaded.</li>
+</ul>
+</div>
+<div class="section" id="concepts-and-keywords-involved">
+<h3>4.1.3. Concepts and Keywords involved<a class="headerlink" href="#concepts-and-keywords-involved" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="prerequisites">
+<h3>4.1.4. Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<p>C Programming.</p>
+</div>
+</div>
+<div class="section" id="what-are-kernel-modules">
+<h2>4.2. What are Kernel Modules<a class="headerlink" href="#what-are-kernel-modules" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Pieces of code that can be loaded and unloaded into the kernel upon demand.</li>
+<li>Extends the functionality of the kernel without the need to reboot the system.</li>
+<li>Device drivers which allows the kernel to access hardware connected to the
+system. If we plug any new device the kernel cannot use it properly unless we
+have the right drivers in place. The kernel detects the device type and loads
+the respective modules from the code base. Thus device drivers are generally
+modules (apart from the basic / legacy drivers.)</li>
+</ul>
+</div>
+<div class="section" id="kernel-module-advantages">
+<h2>4.3. Kernel Module Advantages<a class="headerlink" href="#kernel-module-advantages" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Without modules, we would have to build monolithic kernels.</li>
+<li>Adding new functionality would require adding the code in the kernel image which will need recompilation.</li>
+<li>Monolithic kernel leads to  larger kernel images resulting in loading code which is not required.</li>
+<li>Rebooting machine whenever new functionality is added.</li>
+<li>Example: till the time you don&#8217;t have to mount a Ext2 file system why will you load code for reading ext2 file system.</li>
+</ul>
+</div>
+<div class="section" id="tools-for-kernel-modules">
+<h2>4.4. Tools for Kernel Modules<a class="headerlink" href="#tools-for-kernel-modules" title="Permalink to this headline">¶</a></h2>
+<p>Before getting into writing a module we must first see the tools/commands which
+we will use to get the modules working.</p>
+<div class="section" id="insmod">
+<h3>4.4.1. <code class="docutils literal"><span class="pre">insmod</span></code><a class="headerlink" href="#insmod" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">insmod</span></code> - insert module.</li>
+</ul>
+</div>
+<div class="section" id="modprobe">
+<h3>4.4.2. <code class="docutils literal"><span class="pre">modprobe</span></code><a class="headerlink" href="#modprobe" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">modprobe</span> <span class="pre">-r</span></code> - remove the module present in the kernel.</li>
+</ul>
+</div>
+<div class="section" id="rmmod">
+<h3>4.4.3. <code class="docutils literal"><span class="pre">rmmod</span></code><a class="headerlink" href="#rmmod" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">rmmod</span></code> - remove the module present in the kernel.</li>
+</ul>
+</div>
+<div class="section" id="lsmod">
+<h3>4.4.4. <code class="docutils literal"><span class="pre">lsmod</span></code><a class="headerlink" href="#lsmod" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">lsmod</span></code> - list the modules inserted in the kernel.</li>
+</ul>
+</div>
+<div class="section" id="modinfo">
+<h3>4.4.5. <code class="docutils literal"><span class="pre">modinfo</span></code><a class="headerlink" href="#modinfo" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">modinfo</span></code> - prints the information of the module.</li>
+</ul>
+</div>
+<div class="section" id="dmesg">
+<h3>4.4.6. <code class="docutils literal"><span class="pre">dmesg</span></code><a class="headerlink" href="#dmesg" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">dmesg</span></code></li>
+</ul>
+</div>
+<div class="section" id="syslog">
+<h3>4.4.7. <code class="docutils literal"><span class="pre">syslog</span></code><a class="headerlink" href="#syslog" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">syslog</span></code></li>
+</ul>
+</div>
+<div class="section" id="some-system-calls">
+<h3>4.4.8. Some System Calls<a class="headerlink" href="#some-system-calls" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">init_module(),</span> <span class="pre">query_module(),</span> <span class="pre">create_module(),</span> <span class="pre">delete_module()</span></code> - system calls called by the various commands to insert/delete module to the kernel space.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="new-functions">
+<h2>4.5. New Functions<a class="headerlink" href="#new-functions" title="Permalink to this headline">¶</a></h2>
+<p>There are few new things which you will see in the code.</p>
+<div class="section" id="printk">
+<h3>4.5.1. <code class="docutils literal"><span class="pre">printk()</span></code><a class="headerlink" href="#printk" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">printk()</span></code> - this is the kernel counter part of the user space
+<code class="docutils literal"><span class="pre">printf()</span></code> function. Its syntax is <code class="docutils literal"><span class="pre">printk(LEVEL</span> <span class="pre">&quot;FORMAT_SPECIFIER&quot;,</span>
+<span class="pre">parameters)</span></code>. The <code class="docutils literal"><span class="pre">LEVEL</span></code> is used to specify the severity of the message
+you wish to print. See <span class="xref std std-ref">different_log_levels_printk-label</span>.</li>
+</ul>
+</div>
+<div class="section" id="module-init">
+<h3>4.5.2. <code class="docutils literal"><span class="pre">module_init()</span></code><a class="headerlink" href="#module-init" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">module_init()</span></code> - <code class="docutils literal"><span class="pre">module_init()</span></code> is the first function which will be
+called when the module is loaded. This gives us a entry point to the kernel
+module. Here we can initialize the global variables, setup functions, setup
+enviornment and other stuff. The use of this will be clear in the next
+chapters.</li>
+</ul>
+</div>
+<div class="section" id="module-exit">
+<h3>4.5.3. <code class="docutils literal"><span class="pre">module_exit()</span></code><a class="headerlink" href="#module-exit" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">module_exit()</span></code> - <code class="docutils literal"><span class="pre">module_exit()</span></code> is the function which is called when
+the module is being unloaded from the system. Here we can free the
+allocated memory, free the locks and do other cleanup actions. This will be
+clear in the coming chapters.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="hello-world-kernel-module">
+<h2>4.6. Hello World Kernel Module<a class="headerlink" href="#hello-world-kernel-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>4.6.1. Introduction<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>We will write our first kernel module. We will code it, compile it and then
+<code class="docutils literal"><span class="pre">insert</span></code> the module in the kernel. When the module gets inserted the kernel
+gets the functionality provided by the module. In this <code class="docutils literal"><span class="pre">Hello</span> <span class="pre">World</span></code> module,
+their is no functionality provided to the kernel. The module just gets inserted
+and it prints <code class="docutils literal"><span class="pre">Hello</span> <span class="pre">World</span></code>. You can see the message printed by the kernel
+module by running the <code class="docutils literal"><span class="pre">dmesg</span></code> tool. <code class="docutils literal"><span class="pre">dmesg</span></code> shows you the buffer of the
+kernel.</p>
+</div>
+<div class="section" id="code">
+<h3>4.6.2. Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="file-mymodule-c">
+<h4>4.6.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule.c</span></code><a class="headerlink" href="#file-mymodule-c" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * &lt;PD&gt; Hello World Module &lt;/PD&gt;</span>
+<span class="cm"> */</span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;linux/module.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/init.h&gt;</span><span class="cp"></span>
+
+<span class="cm">/*</span>
+<span class="cm"> * This is the starting point of the kernel module&#39;s code execution.</span>
+<span class="cm"> * Right now we will just print a hello and return from here.</span>
+<span class="cm"> */</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="n">__init</span> <span class="nf">my_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Hello from Hello Module&quot;</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * This is the exit point of the kernel module. When the module is removed </span>
+<span class="cm"> * this function is called to do any sort of cleanup activities and other such</span>
+<span class="cm"> *  stuff.</span>
+<span class="cm"> * </span>
+<span class="cm"> * For example you have made a tree where you keep someinformation - you would </span>
+<span class="cm"> * like to place the code for removing the nodes of the tree here.</span>
+<span class="cm"> */</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="n">__exit</span> <span class="nf">my_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Bye from Hello Module&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">my_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">my_exit</span><span class="p">);</span>
+
+<span class="n">MODULE_DESCRIPTION</span><span class="p">(</span><span class="s">&quot;Sample Hello World Module&quot;</span><span class="p">);</span>
+<span class="n">MODULE_AUTHOR</span><span class="p">(</span><span class="s">&quot;Rishi Agrawal &lt;rishi.b.agrawal@gmail.com&gt;&quot;</span><span class="p">);</span>
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="file-makefile">
+<h4>4.6.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code><a class="headerlink" href="#file-makefile" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-make"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">MODULE_FILENAME</span><span class="o">=</span>mymodule
+
+<span class="nv">obj-m</span> <span class="o">+=</span>  <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.o
+<span class="nv">KO_FILE</span><span class="o">=</span><span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.ko
+
+<span class="k">export </span><span class="nv">KROOT</span><span class="o">=</span>/lib/modules/<span class="k">$(</span>shell uname -r<span class="k">)</span>/build
+
+<span class="nf">modules</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules
+
+<span class="nf">modules_install</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules_install
+
+<span class="nf">clean</span><span class="o">:</span> 
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> clean
+	rm -rf   Module.symvers modules.order
+
+<span class="nf">insert</span><span class="o">:</span> <span class="n">modules</span>
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span>
+
+<span class="nf">remove</span><span class="o">:</span>
+	sudo rmmod <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>
+
+<span class="nf">printlog</span><span class="o">:</span>
+	sudo dmesg -c 
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span>
+	dmesg
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="common-questions">
+<h3>4.6.3. Common Questions<a class="headerlink" href="#common-questions" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="how-to-run-the-code">
+<h4>4.6.3.1. How to run the code<a class="headerlink" href="#how-to-run-the-code" title="Permalink to this headline">¶</a></h4>
+<p>To insert the module we need to use the <code class="docutils literal"><span class="pre">insmod</span></code> command with the module
+name. We need to be <code class="docutils literal"><span class="pre">root</span></code> while doing it.</p>
+<p>In the <code class="docutils literal"><span class="pre">Makefile</span></code> we have a target <code class="docutils literal"><span class="pre">insert</span></code>. This target calls the
+<code class="docutils literal"><span class="pre">insmod</span></code> command to insert the module into the kernel.</p>
+</div>
+<div class="section" id="how-the-code-gets-executed">
+<h4>4.6.3.2. How the code gets executed<a class="headerlink" href="#how-the-code-gets-executed" title="Permalink to this headline">¶</a></h4>
+<p>On inserting the module the function registered as <code class="docutils literal"><span class="pre">module_init()</span></code> gets
+called. In our case it is <code class="docutils literal"><span class="pre">my_init()</span></code>.</p>
+<p>This function just prints a message to the logs and returns.</p>
+</div>
+<div class="section" id="how-to-remove-the-module">
+<h4>4.6.3.3. How to remove the module<a class="headerlink" href="#how-to-remove-the-module" title="Permalink to this headline">¶</a></h4>
+<p>To remove the module we need to use the <code class="docutils literal"><span class="pre">rmmod</span></code> command with the module name.
+We need to be <code class="docutils literal"><span class="pre">root</span></code> while doing it.</p>
+<p><code class="docutils literal"><span class="pre">rmmod</span> <span class="pre">mymodule</span></code></p>
+</div>
+<div class="section" id="how-the-module-gets-removed-unloaded">
+<h4>4.6.3.4. How the module gets removed/unloaded<a class="headerlink" href="#how-the-module-gets-removed-unloaded" title="Permalink to this headline">¶</a></h4>
+<p>When the <code class="docutils literal"><span class="pre">rmmod</span></code> command is invoked the function registered with
+<code class="docutils literal"><span class="pre">module_exit()</span></code> is called. In our case it is <code class="docutils literal"><span class="pre">my_exit()</span></code>. The function just
+prints the messages in the logs and then returns.</p>
+</div>
+</div>
+</div>
+<div class="section" id="module-which-does-some-calculations">
+<h2>4.7. Module Which Does Some Calculations<a class="headerlink" href="#module-which-does-some-calculations" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>4.7.1. Introduction<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>The above module did not do anything and just printed some messages. We will
+now write a module which will do some calculations.</p>
+<p>The intention of this excercise it to show that its plain C code and you can do
+the regular stuff here as well.</p>
+</div>
+<div class="section" id="id3">
+<h3>4.7.2. Code<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="file-mycalc-c">
+<h4>4.7.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mycalc.c</span></code><a class="headerlink" href="#file-mycalc-c" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * &lt;PD&gt; Module to demostrate how to do some calculations. &lt;/PD&gt;</span>
+<span class="cm"> */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/module.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/init.h&gt;</span><span class="cp"></span>
+
+<span class="k">struct</span> <span class="n">sample</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kt">void</span> <span class="nf">print_sample_struct</span><span class="p">(</span><span class="k">struct</span> <span class="n">sample</span> <span class="n">temp</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">x is %d y is %d&quot;</span><span class="p">,</span> <span class="n">temp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">temp</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">calculator</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">ptra</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="k">struct</span> <span class="n">sample</span> <span class="n">temp</span><span class="p">;</span>
+    <span class="n">temp</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="n">temp</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Sum is           %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Difference is    %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Product is       %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Divison is       %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">/</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Mod is           %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">%</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise NOT of %d Is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">~</span><span class="n">a</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise OR is    %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">|</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise AND is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">&amp;</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise XOR Is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">^</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Logical OR Is    %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">||</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Logical AND Is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">&amp;&amp;</span><span class="n">b</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">%d is greater than %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">&gt;</span><span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">%d is greater than %d&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">%d is equal to %d&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Address of a is %p&quot;</span><span class="p">,</span> <span class="n">ptra</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Value of ptra is %d&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">ptra</span><span class="p">);</span>
+
+    <span class="cm">/*</span>
+<span class="cm">     * You can have loops as well.</span>
+<span class="cm">     */</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span><span class="n">a</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Printing i %d&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/*</span>
+<span class="cm">     * You can have structures as well.</span>
+<span class="cm">     */</span>
+
+    <span class="n">print_sample_struct</span><span class="p">(</span><span class="n">temp</span><span class="p">);</span>
+    
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="n">__init</span> <span class="nf">my_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Hello from Hello Module&quot;</span><span class="p">);</span>
+    <span class="n">calculator</span><span class="p">();</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="n">__exit</span> <span class="nf">my_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Bye from Hello Module&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">my_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">my_exit</span><span class="p">);</span>
+
+<span class="n">MODULE_DESCRIPTION</span><span class="p">(</span><span class="s">&quot;Sample Hello World Module&quot;</span><span class="p">);</span>
+<span class="n">MODULE_AUTHOR</span><span class="p">(</span><span class="s">&quot;Rishi Agrawal &lt;rishi.b.agrawal@gmail.com&gt;&quot;</span><span class="p">);</span>
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="id4">
+<h4>4.7.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code><a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span>MODULE_FILENAME=mycalc
+
+obj-m +=  $(MODULE_FILENAME).o
+KO_FILE=$(MODULE_FILENAME).ko
+
+export KROOT=/lib/modules/$(shell uname -r)/build
+
+compile:
+	@$(MAKE) -C $(KROOT) M=$(PWD) modules
+
+modules_install:
+	@$(MAKE) -C $(KROOT) M=$(PWD) modules_install
+
+clean: 
+	@$(MAKE) -C $(KROOT) M=$(PWD) clean
+	rm -rf   Module.symvers modules.order
+
+insert: compile
+	sudo insmod $(KO_FILE)
+
+remove:
+	sudo rmmod $(MODULE_FILENAME)
+
+printlog:
+	sudo dmesg -c 
+	sudo insmod $(KO_FILE)
+	dmesg
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="module-with-parameters">
+<h2>4.8. Module with Parameters<a class="headerlink" href="#module-with-parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id5">
+<h3>4.8.1. Introduction<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>In the above calculator if we want to change the variables, or we want to do
+calculation of different integers we will have to change the code and hardcode
+the value.</p>
+<p>We do not want that, we want that the values should be taken from the user.
+For this we can pass the paramters to the kernel module to do it.</p>
+<p>First we will see a small module which does it and then we will see it in the
+calculator program.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Explain the code of moduleparam.h</p>
+</div>
+</div>
+<div class="section" id="id6">
+<h3>4.8.2. Code<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="file-mymodule-with-parameters-c">
+<h4>4.8.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule_with_parameters.c</span></code><a class="headerlink" href="#file-mymodule-with-parameters-c" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * &lt;PD&gt; Program to add the passed parameters to a kernel module &lt;/PD&gt;</span>
+<span class="cm"> */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/module.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/init.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#define DEFAULT_PARAM1 100</span>
+<span class="cp">#define DEFAULT_PARAM2 200</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Variable for integer parameter</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">param1</span> <span class="o">=</span> <span class="n">DEFAULT_PARAM1</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">param2</span> <span class="o">=</span> <span class="n">DEFAULT_PARAM2</span><span class="p">;</span>
+
+<span class="cm">/* </span>
+<span class="cm"> * Get the parameters.</span>
+<span class="cm"> */</span>
+<span class="n">module_param</span><span class="p">(</span><span class="n">param2</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="n">module_param</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="n">__init</span> <span class="nf">my_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Hello !! from Paramter Passing Demo Module</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+   <span class="cm">/*</span>
+<span class="cm">    * Print the parameters passed</span>
+<span class="cm">    */</span>
+   
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">The sum of the parameters are :%d:&quot;</span><span class="p">,</span> <span class="n">param1</span> <span class="o">+</span> <span class="n">param2</span><span class="p">);</span>
+   
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Passed Parameters</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+   
+   <span class="k">if</span> <span class="p">(</span><span class="n">param1</span> <span class="o">==</span> <span class="n">DEFAULT_PARAM1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Nothing Passed OR Default Value :%d: for param1 is Passed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">DEFAULT_PARAM1</span><span class="p">);</span>
+   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">param1 passed is :%d:&quot;</span><span class="p">,</span> <span class="n">param1</span><span class="p">);</span>
+   <span class="p">}</span>
+
+   <span class="k">if</span> <span class="p">(</span><span class="n">param1</span> <span class="o">==</span> <span class="n">DEFAULT_PARAM2</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Nothing Passed OR Default Value :%d: for param1 Passed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">DEFAULT_PARAM2</span><span class="p">);</span>
+   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">param2 passed is :%d:&quot;</span><span class="p">,</span> <span class="n">param2</span><span class="p">);</span>
+   <span class="p">}</span>
+
+   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="n">__exit</span> <span class="nf">my_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bye from Parameter Passing Demo Module&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">my_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">my_exit</span><span class="p">);</span>
+
+<span class="n">MODULE_DESCRIPTION</span><span class="p">(</span><span class="s">&quot;Module To Demonstrate Module Parameters&quot;</span><span class="p">);</span>
+<span class="n">MODULE_AUTHOR</span><span class="p">(</span><span class="s">&quot;rishi.b.agrawal@gmail.com&quot;</span><span class="p">);</span>
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL v2&quot;</span><span class="p">);</span>
+<span class="n">MODULE_VERSION</span><span class="p">(</span><span class="s">&quot;1.0&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="id7">
+<h4>4.8.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code><a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-make"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">MODULE_FILENAME</span><span class="o">=</span>mymodule
+
+<span class="nv">obj-m</span> <span class="o">+=</span>  <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.o
+<span class="nv">KO_FILE</span><span class="o">=</span><span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.ko
+
+<span class="k">export </span><span class="nv">KROOT</span><span class="o">=</span>/lib/modules/<span class="k">$(</span>shell uname -r<span class="k">)</span>/build
+
+<span class="nf">compile</span><span class="o">:</span> <span class="n">clean</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules
+
+<span class="nf">modules_install</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules_install
+
+<span class="nf">clean</span><span class="o">:</span> 
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> clean
+	rm -rf   Module.symvers modules.order
+
+<span class="nf">insert</span><span class="o">:</span> <span class="n">compile</span>
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span> <span class="nv">param1</span><span class="o">=</span><span class="m">10</span> <span class="nv">param2</span><span class="o">=</span>20
+
+<span class="nf">remove</span><span class="o">:</span>
+	sudo rmmod <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>
+
+<span class="nf">printlog</span><span class="o">:</span>
+	sudo dmesg -c 
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span>
+	dmesg
+
+<span class="nf">output</span><span class="o">:</span>
+	sudo rmmod <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>
+	sudo dmesg -c
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span> <span class="nv">param1</span><span class="o">=</span><span class="m">10</span> <span class="nv">param2</span><span class="o">=</span>20
+	sudo dmesg -c
+
+<span class="nf">testsanity</span><span class="o">:</span> <span class="n">clean</span> <span class="n">compile</span> <span class="n">insert</span> <span class="n">remove</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="module-with-character-array-and-arrays-as-parameters">
+<h2>4.9. Module with Character Array and Arrays as parameters<a class="headerlink" href="#module-with-character-array-and-arrays-as-parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id8">
+<h3>4.9.1. Introduction<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>Passing paramters is not limited to integers only, we can pass characters and
+arrays as well. See the following example to understand how to do it.</p>
+</div>
+<div class="section" id="questions">
+<h3>4.9.2. Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h3>
+<p>How to pass floats?</p>
+</div>
+<div class="section" id="id9">
+<h3>4.9.3. Code<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id10">
+<h4>4.9.3.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule_with_parameters.c</span></code><a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * &lt;PD&gt; Program to demonstrate arrays and strings for module paramters. &lt;/PD&gt;</span>
+<span class="cm"> */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/module.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/init.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#define DEFAULT_PARAM1 100</span>
+<span class="cp">#define ARRAY_LEN 5</span>
+<span class="cp">#define STRING_LEN 10</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Variable for integer parameter</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">param1</span> <span class="o">=</span> <span class="n">DEFAULT_PARAM1</span><span class="p">;</span>
+<span class="n">module_param</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="n">S_IRUGO</span> <span class="o">|</span> <span class="n">S_IWUSR</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Variable for named parameters</span>
+<span class="cm"> */</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">for_myself</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>
+<span class="n">module_param_named</span><span class="p">(</span><span class="n">for_world</span><span class="p">,</span> <span class="n">for_myself</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="mo">0444</span><span class="p">);</span>
+<span class="n">MODULE_PARM_DESC</span><span class="p">(</span><span class="n">for_world</span><span class="p">,</span> <span class="s">&quot;For the world&quot;</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Variable for integer array</span>
+<span class="cm"> */</span>
+<span class="k">static</span> <span class="kt">int</span> <span class="n">int_array</span><span class="p">[</span><span class="n">ARRAY_LEN</span><span class="p">];</span>
+<span class="kt">int</span> <span class="n">array_len</span><span class="p">;</span>
+<span class="n">module_param_array</span><span class="p">(</span><span class="n">int_array</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">array_len</span><span class="p">,</span> <span class="n">S_IRUGO</span> <span class="o">|</span> <span class="n">S_IWUSR</span><span class="p">);</span>
+<span class="n">MODULE_PARM_DESC</span><span class="p">(</span><span class="n">int_array</span><span class="p">,</span> <span class="s">&quot;Integer array for doing nothing&quot;</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * Variable for strings</span>
+<span class="cm"> */</span>
+<span class="kt">char</span> <span class="n">test</span><span class="p">[</span><span class="n">STRING_LEN</span><span class="p">];</span>
+<span class="n">module_param_string</span><span class="p">(</span><span class="n">test_string</span><span class="p">,</span> <span class="n">test</span><span class="p">,</span> <span class="n">STRING_LEN</span><span class="p">,</span> <span class="n">S_IRUGO</span> <span class="o">|</span> <span class="n">S_IWUSR</span><span class="p">);</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="n">__init</span> <span class="nf">my_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Hello from Hello Module</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Passed Parameters</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+   <span class="cm">/*</span>
+<span class="cm">    * Print the parameters passed</span>
+<span class="cm">    */</span>
+   <span class="k">if</span> <span class="p">(</span><span class="n">param1</span> <span class="o">==</span> <span class="n">DEFAULT_PARAM1</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span>
+             <span class="s">&quot;</span><span class="se">\n</span><span class="s">Nothing Passed or Default Value %d for param1 \</span>
+<span class="s">                              passed</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+             <span class="n">DEFAULT_PARAM1</span><span class="p">);</span>
+   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Param1 passed is %d&quot;</span><span class="p">,</span> <span class="n">param1</span><span class="p">);</span>
+   <span class="p">}</span>
+
+   <span class="cm">/*</span>
+<span class="cm">    * Module Parameter named - see the file </span>
+<span class="cm">    * /sys/module/-module-name-/parameters</span>
+<span class="cm">    */</span>
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Value of for_myself is %d&quot;</span><span class="p">,</span> <span class="n">for_myself</span><span class="p">);</span>
+
+   <span class="cm">/*</span>
+<span class="cm">    * Integer array as a parameter</span>
+<span class="cm">    */</span>
+   <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">array_len</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Interger Array element %d is %d&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span>
+             <span class="n">int_array</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+   <span class="p">}</span>
+
+   <span class="cm">/*</span>
+<span class="cm">      Print the Character array</span>
+<span class="cm">    */</span>
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">The character array passed %s&quot;</span><span class="p">,</span> <span class="n">test</span><span class="p">);</span>
+   <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="n">__exit</span> <span class="nf">my_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Bye from Hello Module&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">my_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">my_exit</span><span class="p">);</span>
+
+<span class="n">MODULE_DESCRIPTION</span><span class="p">(</span><span class="s">&quot;module to demonstrate module parameters&quot;</span><span class="p">);</span>
+<span class="n">MODULE_AUTHOR</span><span class="p">(</span><span class="s">&quot;abr&quot;</span><span class="p">);</span>
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL v2&quot;</span><span class="p">);</span>
+<span class="n">MODULE_VERSION</span><span class="p">(</span><span class="s">&quot;1.0&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="id11">
+<h4>4.9.3.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code><a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-make"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">MODULE_FILENAME</span><span class="o">=</span>mymodule_with_parameters
+
+<span class="nv">obj-m</span> <span class="o">+=</span>  <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.o
+<span class="nv">KO_FILE</span><span class="o">=</span><span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.ko
+
+<span class="k">export </span><span class="nv">KROOT</span><span class="o">=</span>/lib/modules/<span class="k">$(</span>shell uname -r<span class="k">)</span>/build
+
+<span class="nf">compile</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules
+
+<span class="nf">modules_install</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules_install
+
+<span class="nf">clean</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> clean
+	rm -rf   Module.symvers modules.order
+
+<span class="nf">insert</span><span class="o">:</span> <span class="n">compile</span>
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span>
+
+<span class="nf">remove</span><span class="o">:</span>
+	sudo rmmod <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>
+
+<span class="nf">printlog</span><span class="o">:</span>
+	sudo dmesg -c 
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span>
+	dmesg
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="calculator-with-parameters">
+<h2>4.10. Calculator with parameters<a class="headerlink" href="#calculator-with-parameters" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h3>4.10.1. Introduction<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>In this module, we have mostly changed the calculator&#8217;s code to suite the parameter passing.</p>
+</div>
+<div class="section" id="id13">
+<h3>4.10.2. Code<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="file-mycalc-with-parameters-c">
+<h4>4.10.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mycalc_with_parameters.c</span></code><a class="headerlink" href="#file-mycalc-with-parameters-c" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cm">/*</span>
+<span class="cm"> * &lt;PD&gt; Calculator  with parameters &lt;/PD&gt;</span>
+<span class="cm"> */</span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/module.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;linux/init.h&gt;</span><span class="cp"></span>
+
+<span class="k">struct</span> <span class="n">sample</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kt">void</span> <span class="nf">print_sample_struct</span><span class="p">(</span><span class="k">struct</span> <span class="n">sample</span> <span class="n">temp</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">x is %d y is %d&quot;</span><span class="p">,</span> <span class="n">temp</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">temp</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="cm">/*</span>
+<span class="cm"> * Variable for integer parameter</span>
+<span class="cm"> */</span>
+<span class="kt">int</span> <span class="n">param1</span><span class="p">;</span>
+<span class="n">module_param</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="n">param2</span><span class="p">;</span>
+<span class="n">module_param</span><span class="p">(</span><span class="n">param2</span><span class="p">,</span> <span class="kt">int</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">calculator</span><span class="p">(</span><span class="kt">int</span> <span class="n">a</span><span class="p">,</span> <span class="kt">int</span> <span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="o">*</span><span class="n">ptra</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">a</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="k">struct</span> <span class="n">sample</span> <span class="n">temp</span><span class="p">;</span>
+    <span class="n">temp</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="n">temp</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Sum is           %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Difference is    %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">-</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Product is       %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Divison is       %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">/</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Mod is           %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">%</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise NOT of %d Is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="o">~</span><span class="n">a</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise OR is    %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">|</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise AND is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">&amp;</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Bitwise XOR Is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">^</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Logical OR Is    %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">||</span><span class="n">b</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Logical AND Is   %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">&amp;&amp;</span><span class="n">b</span><span class="p">);</span>
+
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">a</span><span class="o">&gt;</span><span class="n">b</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">%d is greater than %d&quot;</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">b</span><span class="o">&gt;</span><span class="n">a</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">%d is greater than %d&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">%d is equal to %d&quot;</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">);</span>
+    <span class="p">}</span>
+
+
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Address of a is %p&quot;</span><span class="p">,</span> <span class="n">ptra</span><span class="p">);</span>
+    <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Value of ptra is %d&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">ptra</span><span class="p">);</span>
+
+    <span class="cm">/*</span>
+<span class="cm">     * You can have loops as well.</span>
+<span class="cm">     */</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span><span class="n">a</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printk</span> <span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">Printing i %d&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/*</span>
+<span class="cm">     * You can have structures as well.</span>
+<span class="cm">     */</span>
+
+    <span class="n">print_sample_struct</span><span class="p">(</span><span class="n">temp</span><span class="p">);</span>
+    
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * This is the starting point of the kernel module&#39;s code execution.</span>
+<span class="cm"> * Right now we will just print a hello and return from here.</span>
+<span class="cm"> */</span>
+
+<span class="k">static</span> <span class="kt">int</span> <span class="n">__init</span> <span class="nf">my_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="cm">/*</span>
+<span class="cm">     * Variable for integer parameter</span>
+<span class="cm">     */</span>
+	<span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Hello from Hello Module&quot;</span><span class="p">);</span>
+    
+    <span class="n">calculator</span><span class="p">(</span><span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">/*</span>
+<span class="cm"> * This is the exit point of the kernel module. When the module is removed </span>
+<span class="cm"> * this function is called to do any sort of cleanup activities and other such</span>
+<span class="cm"> *  stuff.</span>
+<span class="cm"> * </span>
+<span class="cm"> * For example you have made a tree where you keep someinformation - you would </span>
+<span class="cm"> * like to place the code for removing the nodes of the tree here.</span>
+<span class="cm"> */</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="n">__exit</span> <span class="nf">my_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">printk</span><span class="p">(</span><span class="n">KERN_INFO</span> <span class="s">&quot;Bye from Hello Module&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">my_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">my_exit</span><span class="p">);</span>
+
+<span class="n">MODULE_DESCRIPTION</span><span class="p">(</span><span class="s">&quot;Calculator with parameters.&quot;</span><span class="p">);</span>
+<span class="n">MODULE_AUTHOR</span><span class="p">(</span><span class="s">&quot;Rishi Agrawal &lt;rishi.b.agrawal@gmail.com&gt;&quot;</span><span class="p">);</span>
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="id14">
+<h4>4.10.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code><a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-make"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nv">MODULE_FILENAME</span><span class="o">=</span>mycalc_with_parameters
+
+<span class="nv">obj-m</span> <span class="o">+=</span>  <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.o
+<span class="nv">KO_FILE</span><span class="o">=</span><span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>.ko
+
+<span class="k">export </span><span class="nv">KROOT</span><span class="o">=</span>/lib/modules/<span class="k">$(</span>shell uname -r<span class="k">)</span>/build
+
+<span class="nf">modules</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules
+
+<span class="nf">modules_install</span><span class="o">:</span>
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules_install
+
+<span class="nf">clean</span><span class="o">:</span> 
+	@<span class="k">$(</span>MAKE<span class="k">)</span> -C <span class="k">$(</span>KROOT<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> clean
+	rm -rf   Module.symvers modules.order
+
+<span class="nf">insert</span><span class="o">:</span>
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span>
+
+<span class="nf">remove</span><span class="o">:</span>
+	sudo rmmod <span class="k">$(</span>MODULE_FILENAME<span class="k">)</span>
+
+<span class="nf">printlog</span><span class="o">:</span>
+	sudo dmesg -c 
+	sudo insmod <span class="k">$(</span>KO_FILE<span class="k">)</span>
+	dmesg
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>4.11. Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>In this chapter we mostly learnt about the very basics of kernel module
+programming. We have a lot of ground to cover. Let&#8217;s get into other concepts of
+modules.</p>
+</div>
+<div class="section" id="references">
+<h2>4.12. References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../wip.index.html">Page contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">4. Kernel Modules</a><ul>
+<li><a class="reference internal" href="#introduction">4.1. Introduction</a><ul>
+<li><a class="reference internal" href="#why-this-chapter">4.1.1. Why this chapter</a></li>
+<li><a class="reference internal" href="#what-will-you-learn">4.1.2. What will you learn</a></li>
+<li><a class="reference internal" href="#concepts-and-keywords-involved">4.1.3. Concepts and Keywords involved</a></li>
+<li><a class="reference internal" href="#prerequisites">4.1.4. Prerequisites</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#what-are-kernel-modules">4.2. What are Kernel Modules</a></li>
+<li><a class="reference internal" href="#kernel-module-advantages">4.3. Kernel Module Advantages</a></li>
+<li><a class="reference internal" href="#tools-for-kernel-modules">4.4. Tools for Kernel Modules</a><ul>
+<li><a class="reference internal" href="#insmod">4.4.1. <code class="docutils literal"><span class="pre">insmod</span></code></a></li>
+<li><a class="reference internal" href="#modprobe">4.4.2. <code class="docutils literal"><span class="pre">modprobe</span></code></a></li>
+<li><a class="reference internal" href="#rmmod">4.4.3. <code class="docutils literal"><span class="pre">rmmod</span></code></a></li>
+<li><a class="reference internal" href="#lsmod">4.4.4. <code class="docutils literal"><span class="pre">lsmod</span></code></a></li>
+<li><a class="reference internal" href="#modinfo">4.4.5. <code class="docutils literal"><span class="pre">modinfo</span></code></a></li>
+<li><a class="reference internal" href="#dmesg">4.4.6. <code class="docutils literal"><span class="pre">dmesg</span></code></a></li>
+<li><a class="reference internal" href="#syslog">4.4.7. <code class="docutils literal"><span class="pre">syslog</span></code></a></li>
+<li><a class="reference internal" href="#some-system-calls">4.4.8. Some System Calls</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#new-functions">4.5. New Functions</a><ul>
+<li><a class="reference internal" href="#printk">4.5.1. <code class="docutils literal"><span class="pre">printk()</span></code></a></li>
+<li><a class="reference internal" href="#module-init">4.5.2. <code class="docutils literal"><span class="pre">module_init()</span></code></a></li>
+<li><a class="reference internal" href="#module-exit">4.5.3. <code class="docutils literal"><span class="pre">module_exit()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hello-world-kernel-module">4.6. Hello World Kernel Module</a><ul>
+<li><a class="reference internal" href="#id1">4.6.1. Introduction</a></li>
+<li><a class="reference internal" href="#code">4.6.2. Code</a><ul>
+<li><a class="reference internal" href="#file-mymodule-c">4.6.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule.c</span></code></a></li>
+<li><a class="reference internal" href="#file-makefile">4.6.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-questions">4.6.3. Common Questions</a><ul>
+<li><a class="reference internal" href="#how-to-run-the-code">4.6.3.1. How to run the code</a></li>
+<li><a class="reference internal" href="#how-the-code-gets-executed">4.6.3.2. How the code gets executed</a></li>
+<li><a class="reference internal" href="#how-to-remove-the-module">4.6.3.3. How to remove the module</a></li>
+<li><a class="reference internal" href="#how-the-module-gets-removed-unloaded">4.6.3.4. How the module gets removed/unloaded</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-which-does-some-calculations">4.7. Module Which Does Some Calculations</a><ul>
+<li><a class="reference internal" href="#id2">4.7.1. Introduction</a></li>
+<li><a class="reference internal" href="#id3">4.7.2. Code</a><ul>
+<li><a class="reference internal" href="#file-mycalc-c">4.7.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mycalc.c</span></code></a></li>
+<li><a class="reference internal" href="#id4">4.7.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-with-parameters">4.8. Module with Parameters</a><ul>
+<li><a class="reference internal" href="#id5">4.8.1. Introduction</a></li>
+<li><a class="reference internal" href="#id6">4.8.2. Code</a><ul>
+<li><a class="reference internal" href="#file-mymodule-with-parameters-c">4.8.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule_with_parameters.c</span></code></a></li>
+<li><a class="reference internal" href="#id7">4.8.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-with-character-array-and-arrays-as-parameters">4.9. Module with Character Array and Arrays as parameters</a><ul>
+<li><a class="reference internal" href="#id8">4.9.1. Introduction</a></li>
+<li><a class="reference internal" href="#questions">4.9.2. Questions</a></li>
+<li><a class="reference internal" href="#id9">4.9.3. Code</a><ul>
+<li><a class="reference internal" href="#id10">4.9.3.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule_with_parameters.c</span></code></a></li>
+<li><a class="reference internal" href="#id11">4.9.3.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#calculator-with-parameters">4.10. Calculator with parameters</a><ul>
+<li><a class="reference internal" href="#id12">4.10.1. Introduction</a></li>
+<li><a class="reference internal" href="#id13">4.10.2. Code</a><ul>
+<li><a class="reference internal" href="#file-mycalc-with-parameters-c">4.10.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mycalc_with_parameters.c</span></code></a></li>
+<li><a class="reference internal" href="#id14">4.10.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion">4.11. Conclusion</a></li>
+<li><a class="reference internal" href="#references">4.12. References</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="02_kernel_compilation.html"
+                          title="Previous page">&larr; 3. Kernel Compilation</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="04_exporting_symbols.html"
+                          title="Next page">&rarr; 1. EXPORT_SYMBOL</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/doc/03_kernel_modules.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="04_exporting_symbols.html" title="1. EXPORT_SYMBOL"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="02_kernel_compilation.html" title="3. Kernel Compilation"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="../index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Rishi Agrawal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>

@@ -1,0 +1,1 @@
+cmd_/home/rishi/mydev/lkw/doc/code/06_proc/04/myproc.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/rishi/mydev/lkw/doc/code/06_proc/04/myproc.ko /home/rishi/mydev/lkw/doc/code/06_proc/04/myproc.o /home/rishi/mydev/lkw/doc/code/06_proc/04/myproc.mod.o

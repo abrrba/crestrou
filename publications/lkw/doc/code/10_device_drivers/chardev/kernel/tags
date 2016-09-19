@@ -1,0 +1,31 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BUF_LEN	chardev.c	33;"	d	file:
+CC	Makefile	/^CC = gcc$/;"	m
+CONFIG_CHARDEV	Makefile	/^CONFIG_CHARDEV = m$/;"	m
+DEVICE_NAME	chardev.c	31;"	d	file:
+Device_Open	chardev.c	/^static int Device_Open = 0;   \/* Is device open?  $/;"	v	file:
+MODULE_NAME	Makefile	/^MODULE_NAME = chardev$/;"	m
+Major	chardev.c	/^static int Major;    \/* Major number assigned to our device driver *\/$/;"	v	file:
+SUCCESS	chardev.c	30;"	d	file:
+__this_module	chardev.mod.c	/^__visible struct module __this_module$/;"	v	typeref:struct:module
+__used	chardev.mod.c	/^__used$/;"	v	file:
+__used	chardev.mod.c	/^__used$/;"	v	typeref:struct:____versions	file:
+cleanup_module	chardev.c	/^void cleanup_module(void)$/;"	f
+device_ioctl	chardev.c	/^static long device_ioctl(struct file *file, unsigned int cmd, unsigned long arg)$/;"	f	file:
+device_open	chardev.c	/^static int device_open(struct inode *inode, struct file *file)$/;"	f	file:
+device_read	chardev.c	/^static ssize_t device_read(struct file *filp, \/* see include\/linux\/fs.h   *\/$/;"	f	file:
+device_release	chardev.c	/^static int device_release(struct inode *inode, struct file *file)$/;"	f	file:
+device_write	chardev.c	/^device_write(struct file *filp, const char *buff, size_t len, loff_t * off)$/;"	f	file:
+fops	chardev.c	/^static struct file_operations fops = {$/;"	v	typeref:struct:file_operations	file:
+init_module	chardev.c	/^int init_module(void)$/;"	f
+msg	chardev.c	/^static char msg[BUF_LEN]; \/* The msg the device will give when asked*\/$/;"	v	file:
+msg_Ptr	chardev.c	/^static char *msg_Ptr;$/;"	v	file:
+number	chardev.c	/^   int number;$/;"	m	struct:param	file:
+param	chardev.c	/^struct param {$/;"	s	file:
+ptr	chardev.c	/^   char *ptr[];$/;"	m	struct:param	file:
+unlocked_device_ioctl	chardev.c	/^static long unlocked_device_ioctl( struct file *file, unsigned int cmd, unsigned long arg)$/;"	f	file:

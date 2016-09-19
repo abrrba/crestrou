@@ -1,0 +1,1030 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. Kernel Compilation &#8212; Linux Kernel Workbook 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../_static/cloud.js"></script>
+    <link rel="top" title="Linux Kernel Workbook 1.0 documentation" href="../wip.index.html" />
+    <link rel="next" title="4. Kernel Modules" href="03_kernel_modules.html" />
+    <link rel="prev" title="2. Setting Up" href="01_setting_up.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="03_kernel_modules.html" title="4. Kernel Modules"
+             accesskey="N">next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="01_setting_up.html" title="2. Setting Up"
+             accesskey="P">previous</a> &nbsp; &nbsp;</li>
+    <li><a href="../index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kernel-compilation">
+<h1>3. Kernel Compilation<a class="headerlink" href="#kernel-compilation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>3.1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>At first we will learn how to compile a kernel. This is just a series of steps we need to do in
+order to compile and boot to a new kernel.</p>
+<div class="section" id="why-this-chapter">
+<h3>3.1.1. Why this chapter<a class="headerlink" href="#why-this-chapter" title="Permalink to this headline">¶</a></h3>
+<p>This chapter will give you your first hands on with Linux Kernel - thus
+enabling you understand some fundamental concepts around it.</p>
+<p>You compile the kernel - make changes to the kernel right in the first chapter.
+So your exicting journey with Linux kernel begins.</p>
+</div>
+<div class="section" id="what-will-you-learn">
+<h3>3.1.2. What will you learn<a class="headerlink" href="#what-will-you-learn" title="Permalink to this headline">¶</a></h3>
+<p>You will learn</p>
+<ul class="simple">
+<li>How to download a Linux kernel.</li>
+<li>How to configure the Linux kernel in differnent ways.</li>
+<li>How to see the effects of the configuration changes you did.</li>
+<li>Compile a Linux kernel.</li>
+<li>Package a compiled kernel.</li>
+<li>Install a Linux kernel.</li>
+<li>Boot from a new Linux kernel.</li>
+<li>Making only a module in the kernel.</li>
+</ul>
+</div>
+<div class="section" id="prerequisites">
+<h3>3.1.3. Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>We expect that you have already installed a Linux system and have some basic understanding of Linux terminal.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="linux-kernel">
+<h2>3.2. Linux Kernel<a class="headerlink" href="#linux-kernel" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This is simple code written in <code class="docutils literal"><span class="pre">C</span></code>.</li>
+<li>This is a <strong>LARGE</strong> <code class="docutils literal"><span class="pre">C</span></code> program.</li>
+<li>Code looks difficult to understand because of the LARGENESS of the system and lack of understanding of the operating system concepts.</li>
+<li>You have to be little more careful while coding as small mistakes can cause the whole system to crash. Debugging these can be diffcult at times.</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h2>3.3. Kernel Compilation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>We may need to compile our own kernel to add/remove some features present in the system.</li>
+<li>The kernel distributed with <strong>general settings</strong> setting which should run on all the possible installations.</li>
+<li>Thus they need to support a wide range of hardware.</li>
+<li>Some of the features may be built in the kernel while some of them may be built as modules.</li>
+<li>It&#8217;s alright if they are built as module as they don&#8217;t increase the size of the kernel.</li>
+<li>Built-in features will increase the size of kernel, thus effecting the system&#8217;s performance. (not too heavily)</li>
+<li>Making our own kernel will ensure the kernel is having appropriate set of features.</li>
+<li>Double check before you <strong>remove</strong> any feature, your freshly compiled kernel may not boot :-).</li>
+<li>Read <code class="docutils literal"><span class="pre">Linux</span> <span class="pre">Kernel</span> <span class="pre">In</span> <span class="pre">A</span> <span class="pre">Nutshell</span></code> for further understanding.</li>
+</ul>
+<div class="section" id="compiling-a-kernel-steps">
+<span id="install-linux-kernel-label"></span><h3>3.3.1. Compiling a Kernel - Steps<a class="headerlink" href="#compiling-a-kernel-steps" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>www.kernel.org - download the new kernel from this website.</li>
+<li><strong class="command">tar -xzf/xjf downloaded kernel</strong></li>
+<li><strong class="command">make oldconfig</strong> - makes the old configuration present in the system, if new features are present asks about them.</li>
+<li><strong class="command">make defconfig</strong> - makes the default configuration for your architecture, the configuration file is present in <code class="docutils literal"><span class="pre">arch/ARCHITECTURE/configs/</span></code>.</li>
+<li><strong class="command">make gconfig</strong> - gives a GTK based configuration menu. (We will not use this in this book.)</li>
+<li><strong class="command">make menuconfig</strong> - gives a ncurses based configuration menu.</li>
+<li><strong class="command">make modules</strong> - makes the modules.</li>
+<li><strong class="command">make modules_install</strong> - installs the modules to the required loaction usually <code class="docutils literal"><span class="pre">/lib/modules/KERNEL-VERSION/kernel</span></code>.</li>
+<li><strong class="command">make install</strong> - installs the kernel in the required location usually <code class="docutils literal"><span class="pre">/boot/</span></code>, makes the initial ramfs sets up the boot loader, you are now ready to reboot your system.</li>
+</ul>
+</div>
+<div class="section" id="hands-on-compling-a-kernel">
+<h3>3.3.2. Hands-On Compling a Kernel<a class="headerlink" href="#hands-on-compling-a-kernel" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Let us see the current kernel version on the system</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ uname -a
+Linux rishi-VirtualBox 4.4.0-24-generic #43-Ubuntu SMP Wed Jun 8 19:27:37 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+</pre></div>
+</div>
+<ul class="simple">
+<li>First download the kernel. We will use the 4.7 kernel for it.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.7.tar.xz
+--2016-07-28 08:38:14--  https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.7.tar.xz
+Resolving cdn.kernel.org (cdn.kernel.org)... 151.101.8.69
+Connecting to cdn.kernel.org (cdn.kernel.org)|151.101.8.69|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 90412100 (86M) [application/x-xz]
+Saving to: ‘linux-4.7.tar.xz’
+
+100%[================================================================================&gt;]
+9,04,12,100  225KB/s   in 4m 23s
+
+2016-07-28 08:42:39 (336 KB/s) - ‘linux-4.7.tar.xz’ saved [90412100/90412100]
+</pre></div>
+</div>
+<ul class="simple">
+<li>Copy the kernel to your virtual machine. Here replace the IP with your machine&#8217;s IP. You can directly download the kernel in your virtual machine as well.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mi">08</span><span class="p">:</span><span class="mi">42</span> <span class="o">-</span> <span class="p">]</span> <span class="o">--------</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">rishi</span><span class="o">/</span><span class="n">code</span>
+<span class="p">[</span><span class="n">rishi</span><span class="o">-</span><span class="n">office</span> <span class="mi">7</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">scp</span> <span class="n">linux</span><span class="o">-</span><span class="mf">4.7</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">xz</span> <span class="n">rishi</span><span class="nd">@192</span><span class="o">.</span><span class="mf">168.0</span><span class="o">.</span><span class="mi">106</span><span class="p">:</span>
+<span class="n">linux</span><span class="o">-</span><span class="mf">4.7</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">xz</span>
+<span class="mi">100</span><span class="o">%</span>   <span class="mi">86</span><span class="n">MB</span>  <span class="mf">86.2</span><span class="n">MB</span><span class="o">/</span><span class="n">s</span>   <span class="mi">00</span><span class="p">:</span><span class="mi">01</span>
+<span class="p">[</span><span class="mi">08</span><span class="p">:</span><span class="mi">47</span> <span class="o">-</span> <span class="p">]</span> <span class="o">--------</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">rishi</span><span class="o">/</span><span class="n">code</span>
+<span class="p">[</span><span class="n">rishi</span><span class="o">-</span><span class="n">office</span> <span class="mi">8</span><span class="p">]</span> <span class="o">&gt;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Untar the kernel</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ tar -xf linux-4.7.tar.xz
+</pre></div>
+</div>
+<ul class="simple">
+<li>This will give you a folder.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ ls
+linux-4.7  linux-4.7.tar.xz
+</pre></div>
+</div>
+<ul class="simple">
+<li>This folder has thousands of files. Lets do a <code class="docutils literal"><span class="pre">find</span></code> and count the number of files.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~/lkw$ find linux-4.7/| wc -l
+58057
+</pre></div>
+</div>
+<ul class="simple">
+<li>This folder has a lot of folders. See the following tree command.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ tree linux-4.7  -L 1 -f
+linux-4.7
+|__ linux-4.7/arch
+|__ linux-4.7/block
+|__ linux-4.7/certs
+|__ linux-4.7/COPYING
+|__ linux-4.7/CREDITS
+|__ linux-4.7/crypto
+|__ linux-4.7/Documentation
+|__ linux-4.7/drivers
+|__ linux-4.7/firmware
+|__ linux-4.7/fs
+|__ linux-4.7/include
+|__ linux-4.7/init
+|__ linux-4.7/ipc
+|__ linux-4.7/Kbuild
+|__ linux-4.7/Kconfig
+|__ linux-4.7/kernel
+|__ linux-4.7/lib
+|__ linux-4.7/MAINTAINERS
+|__ linux-4.7/Makefile
+|__ linux-4.7/mm
+|__ linux-4.7/net
+|__ linux-4.7/README
+|__ linux-4.7/REPORTING-BUGS
+|__ linux-4.7/samples
+|__ linux-4.7/scripts
+|__ linux-4.7/security
+|__ linux-4.7/sound
+|__ linux-4.7/tools
+|__ linux-4.7/usr
+|__ linux-4.7/virt
+</pre></div>
+</div>
+<ul class="simple">
+<li>This folder has a <code class="docutils literal"><span class="pre">Makefile</span></code> which is the <code class="docutils literal"><span class="pre">Makefile</span></code> to compile the kernel. The file is very long, but you need not bother about it. We are interested only in few targets.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ wc -l  Makefile
+1669 Makefile
+</pre></div>
+</div>
+<ul class="simple">
+<li>We will now do the steps mentioned above. Right now the folder has no <code class="docutils literal"><span class="pre">.config</span></code> file. When we configure the kernel for compilation the file get created. The <code class="docutils literal"><span class="pre">.config</span></code> file keep the configuration for the kernel to be built. Whatever configuration changes you do while configuring the kernel, it gets saved in this file.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ ls .config
+ls: cannot access &#39;.config&#39;: No such file or directory
+</pre></div>
+</div>
+<ul class="simple">
+<li>Here is a small snippet of the configuration file which we will generate in sometime.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ tail -f .config
+CONFIG_UCS2_STRING=y
+CONFIG_FONT_SUPPORT=y
+# CONFIG_FONTS is not set
+CONFIG_FONT_8x8=y
+CONFIG_FONT_8x16=y
+# CONFIG_SG_SPLIT is not set
+CONFIG_SG_POOL=y
+CONFIG_ARCH_HAS_SG_CHAIN=y
+CONFIG_ARCH_HAS_PMEM_API=y
+CONFIG_ARCH_HAS_MMIO_FLUSH=y
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">defconfig</span></code> - makes the default configuration for your architecture, the configuration file is present in <code class="docutils literal"><span class="pre">arch/ARCHITECTURE/configs/</span></code>.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make defconfig
+*** Default configuration is based on &#39;x86_64_defconfig&#39;
+#
+# configuration written to .config
+#
+
+rishi@rishi-VirtualBox:~/lkw/linux-4.7$ ls .config
+.config
+</pre></div>
+</div>
+<ul class="simple">
+<li>The config file is very long. See this.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ wc -l .config
+4044 .config
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">oldconfig</span></code> will read the config file <code class="docutils literal"><span class="pre">(/boot/config-4.4.0-24-generic)</span></code> in your machine and try to use that configuration
+file. There might be some features in the new kernel which is not available in the older/default
+kernel you have. For this the command takes input from you. Based on the features you want to enable
+and disable - you can give the inputs.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make oldconfig
+scripts/kconfig/conf  --oldconfig Kconfig
+#
+# using defaults found in /boot/config-4.4.0-24-generic
+#
+/boot/config-4.4.0-24-generic:1631:warning: symbol value &#39;m&#39; invalid
+    for RXKAD
+
+/boot/config-4.4.0-24-generic:3589:warning: symbol value &#39;m&#39; invalid
+    for SERIAL_8250_FINTEK
+*
+* Restart config...
+*
+*
+* General setup
+*
+*
+* Timers subsystem
+*
+Timer tick handling
+  1. Periodic timer ticks (constant rate, no dynticks) (HZ_PERIODIC)
+&gt; 2. Idle dynticks system (tickless idle) (NO_HZ_IDLE)
+  3. Full dynticks system (tickless) (NO_HZ_FULL)
+choice[1-3]: 2
+Old Idle dynticks config (NO_HZ) [Y/n/?] y
+High Resolution Timer Support (HIGH_RES_TIMERS) [Y/n/?] y
+*
+* CPU/Task time and stats accounting
+*
+Cputime accounting
+&gt; 1. Simple tick based cputime accounting (TICK_CPU_ACCOUNTING)
+  2. Full dynticks CPU time accounting (VIRT_CPU_ACCOUNTING_GEN)
+  3. Fine granularity task level IRQ time accounting (IRQ_TIME_ACCOUNTING)
+choice[1-3]: 1
+BSD Process Accounting (BSD_PROCESS_ACCT) [Y/n/?] y
+  BSD Process Accounting version 3 file format (BSD_PROCESS_ACCT_V3) [Y/n/?] y
+Export task/process statistics through netlink (TASKSTATS) [Y/?] y
+  Enable per-task delay accounting (TASK_DELAY_ACCT) [Y/?] y
+  Enable extended accounting over taskstats (TASK_XACCT) [Y/n/?] y
+    Enable per-task storage I/O accounting (TASK_IO_ACCOUNTING) [Y/n/?] y
+*
+* RCU Subsystem
+*
+Make expert-level adjustments to RCU configuration (RCU_EXPERT) [N/y/?] n
+Kernel .config support (IKCONFIG) [N/m/y/?] n
+Kernel log buffer size (16 =&gt; 64KB, 17 =&gt; 128KB) (LOG_BUF_SHIFT) [18] 18
+CPU kernel log buffer size contribution (13 =&gt; 8 KB, 17 =&gt; 128KB) (LOG_CPU_MAX_BUF_SHIFT) [12] 12
+Temporary per-CPU NMI log buffer size (12 =&gt; 4KB, 13 =&gt; 8KB) (NMI_LOG_BUF_SHIFT) [13] (NEW)
+
+-----------SNIPPED------------
+#
+# configuration written to .config
+#
+</pre></div>
+</div>
+<ul class="simple">
+<li>You can see the difference in the default config file and the currently generated <code class="docutils literal"><span class="pre">.config</span></code>
+file by the <code class="docutils literal"><span class="pre">diff</span></code> command.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ diff /boot/config-4.4.0-24-generic .config  | more
+3c3
+&lt; # Linux/x86_64 4.4.0-24-generic Kernel Configuration
+---
+&gt; # Linux/x86 4.7.0 Kernel Configuration
+9d8
+&lt; CONFIG_PERF_EVENTS_INTEL_UNCORE=y
+14d12
+&lt; CONFIG_HAVE_LATENCYTOP_SUPPORT=y
+15a14,17
+&gt; CONFIG_ARCH_MMAP_RND_BITS_MIN=28
+&gt; CONFIG_ARCH_MMAP_RND_BITS_MAX=32
+&gt; CONFIG_ARCH_MMAP_RND_COMPAT_BITS_MIN=8
+&gt; CONFIG_ARCH_MMAP_RND_COMPAT_BITS_MAX=16
+42a45
+&gt; CONFIG_DEBUG_RODATA=y
+69d71
+&lt; CONFIG_VERSION_SIGNATURE=&quot;Ubuntu 4.4.0-24.43-generic 4.4.10&quot;
+97d98
+&lt; # CONFIG_IRQ_FORCED_THREADING_DEFAULT is not set
+145a147
+&gt; CONFIG_NMI_LOG_BUF_SHIFT=13
+153,159d154
+&lt; # CONFIG_CGROUP_DEBUG is not set
+&lt; CONFIG_CGROUP_FREEZER=y
+&lt; CONFIG_CGROUP_PIDS=y
+&lt; CONFIG_CGROUP_DEVICE=y
+&lt; CONFIG_CPUSETS=y
+&lt; CONFIG_PROC_PID_CPUSET=y
+&lt; CONFIG_CGROUP_CPUACCT=y
+164,166c159,161
+&lt; CONFIG_MEMCG_KMEM=y
+&lt; CONFIG_CGROUP_HUGETLB=y
+&lt; CONFIG_CGROUP_PERF=y
+---
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">gconfig</span></code> - gives a GTK based configuration menu. In my system there is no gtk based libraries available hence the window did not start.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~/lkw/linux-4.7$ make gconfig
+*
+* Unable to find the GTK+ installation. Please make sure that
+* the GTK+ 2.0 development package is correctly installed...
+* You need gtk+-2.0, glib-2.0 and libglade-2.0.
+*
+make[1]: *** No rule to make target &#39;scripts/kconfig/.tmp_gtkcheck&#39;, needed by
+&#39;scripts/kconfig/gconf.o&#39;.  Stop.
+Makefile:544: recipe for target &#39;gconfig&#39; failed
+make: *** [gconfig] Error 2
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">menuconfig</span></code> - gives a ncurses based configuration menu. We will use this for configuring our new kernel. <strong>This will initially fail as there is not ncurses installed.</strong></li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make menuconfig
+  HOSTCC  scripts/kconfig/mconf.o
+  In file included from scripts/kconfig/mconf.c:23:0:
+  scripts/kconfig/lxdialog/dialog.h:38:20: fatal error: curses.h: No such file or directory
+  compilation terminated.
+  scripts/Makefile.host:108: recipe for target &#39;scripts/kconfig/mconf.o&#39; failed
+  make[1]: *** [scripts/kconfig/mconf.o] Error 1
+  Makefile:544: recipe for target &#39;menuconfig&#39; failed
+  make: *** [menuconfig] Error 2
+</pre></div>
+</div>
+<ul class="simple">
+<li>We will now install ncurses.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo apt-get install ncurses-dev
+[sudo] password for rishi:
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+Note, selecting &#39;libncurses5-dev&#39; instead of &#39;ncurses-dev&#39;
+The following additional packages will be installed:
+  libtinfo-dev
+Suggested packages:
+  ncurses-doc
+The following NEW packages will be installed:
+  libncurses5-dev libtinfo-dev
+0 upgraded, 2 newly installed, 0 to remove and 306 not upgraded.
+Need to get 252 kB of archives.
+After this operation, 1,461 kB of additional disk space will be used.
+Do you want to continue? [Y/n] y
+Get:1 http://in.archive.ubuntu.com/ubuntu xenial/main amd64 libtinfo-dev amd64 6.0+20160213-1ubuntu1 [77.4 kB]
+Get:2 http://in.archive.ubuntu.com/ubuntu xenial/main amd64 libncurses5-dev amd64 6.0+20160213-1ubuntu1 [175 kB]
+Fetched 252 kB in 0s (255 kB/s)
+Selecting previously unselected package libtinfo-dev:amd64.
+(Reading database ... 209625 files and directories currently installed.)
+Preparing to unpack .../libtinfo-dev_6.0+20160213-1ubuntu1_amd64.deb ...
+Unpacking libtinfo-dev:amd64 (6.0+20160213-1ubuntu1) ...
+Selecting previously unselected package libncurses5-dev:amd64.
+Preparing to unpack .../libncurses5-dev_6.0+20160213-1ubuntu1_amd64.deb ...
+Unpacking libncurses5-dev:amd64 (6.0+20160213-1ubuntu1) ...
+Processing triggers for man-db (2.7.5-1) ...
+Setting up libtinfo-dev:amd64 (6.0+20160213-1ubuntu1) ...
+Setting up libncurses5-dev:amd64 (6.0+20160213-1ubuntu1) ...
+rishi@rishi-VirtualBox:~/lkw/linux-4.7$
+</pre></div>
+</div>
+<ul class="simple">
+<li>Now when we run <code class="docutils literal"><span class="pre">make</span> <span class="pre">menuconfig</span></code> we will get the following on terminal and a ncurses based screen will open.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make menuconfig
+HOSTCC  scripts/kconfig/mconf.o
+HOSTCC  scripts/kconfig/zconf.tab.o
+HOSTCC  scripts/kconfig/lxdialog/checklist.o
+HOSTCC  scripts/kconfig/lxdialog/util.o
+HOSTCC  scripts/kconfig/lxdialog/inputbox.o
+HOSTCC  scripts/kconfig/lxdialog/textbox.o
+HOSTCC  scripts/kconfig/lxdialog/yesno.o
+HOSTCC  scripts/kconfig/lxdialog/menubox.o
+HOSTLD  scripts/kconfig/mconf
+scripts/kconfig/mconf  Kconfig
+</pre></div>
+</div>
+<img alt="../_images/01_make_menuconfig.png" src="../_images/01_make_menuconfig.png" />
+<ul class="simple">
+<li>We will now configure our kernel.</li>
+<li>We will add EXT2 and EXT3 as kernel modules. We will then compare the default config file and the
+currently generated config file to see the effect of the changes. We will also remove the VFAT
+support and add the NTFS support to the kernel image directly. There is no particular reason for
+doing all this. All this is intended to teach you how the configuration of kernel works and what are
+the effect of it. Once the kernel boots we will see how these changes effect the booted kernel.</li>
+</ul>
+<p>We will now do some configuration changes to the new kernel which we will just compile and
+configure.</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Goto - File systems -&gt;</dt>
+<dd><p class="first last">mark <code class="docutils literal"><span class="pre">Ext2</span></code> as module i.e. <code class="docutils literal"><span class="pre">M</span></code>  use spacebar to toggle between the possible values
+mark <code class="docutils literal"><span class="pre">Ext3</span></code> as a built into images i.e. <code class="docutils literal"><span class="pre">*</span></code></p>
+</dd>
+</dl>
+</li>
+</ul>
+<img alt="../_images/02_ext2_ext3.png" src="../_images/02_ext2_ext3.png" />
+<ul>
+<li><dl class="first docutils">
+<dt>Goto - File Systems -&gt; DOS/NT Filesystem</dt>
+<dd><p class="first last">remove VFAT support i.e. <code class="docutils literal"><span class="pre">BLANK</span></code>
+add NTFS module support i.e. <code class="docutils literal"><span class="pre">M</span></code></p>
+</dd>
+</dl>
+</li>
+</ul>
+<img alt="../_images/03_ntfs_fat.png" src="../_images/03_ntfs_fat.png" />
+<ul class="simple">
+<li>Go back using <code class="docutils literal"><span class="pre">&lt;esc&gt;</span> <span class="pre">&lt;esc&gt;</span></code></li>
+<li>Save the configuration, you will get a <code class="docutils literal"><span class="pre">.config</span></code> file in your directory.</li>
+<li>There a ton of features which are configurable. You should just go inside some of them and see what is available and what are the configuration option. Do it !!</li>
+<li>Let us see the difference in the current config of the system and the config file which is generated by us. We are insterested in seeing the entries which must have been modified because of us, hence we are <code class="docutils literal"><span class="pre">grep-ing</span></code> those.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ diff -y /boot/config-4.4.0-24-generic .config | grep -a &quot;EXT2\|EXT3\|VFAT\|NTFS&quot;
+
+# CONFIG_EXT2_FS is not set                               | CONFIG_EXT2_FS=m
+# CONFIG_EXT3_FS is not set                               | # CONFIG_EXT2_FS_XATTR is not set
+                                                          &gt; CONFIG_EXT3_FS=m
+                                                          &gt; # CONFIG_EXT3_FS_POSIX_ACL is not set
+                                                          &gt; # CONFIG_EXT3_FS_SECURITY is not set
+CONFIG_EXT4_USE_FOR_EXT2=y                                &lt;
+CONFIG_MSDOS_FS=m                                         | # CONFIG_VFAT_FS is not set
+CONFIG_VFAT_FS=y                                          | CONFIG_NTFS_FS=y
+CONFIG_FAT_DEFAULT_CODEPAGE=437                                   | CONFIG_NTFS_DEBUG=y
+CONFIG_FAT_DEFAULT_IOCHARSET=&quot;iso8859-1&quot;                  | CONFIG_NTFS_RW=y
+CONFIG_NTFS_FS=m                                          &lt;
+# CONFIG_NTFS_DEBUG is not set                            &lt;
+# CONFIG_NTFS_RW is not set                               &lt;
+</pre></div>
+</div>
+<ul class="simple">
+<li>Let us see the difference between the default configuration file of the kernel and our configuration file.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ diff -y .config ./arch/x86/configs/x86_64_defconfig | grep -i &quot;EXT2\|EXT3\|NTFS\|VFAT&quot;
+# CONFIG_EXT2_FS is not set                   &lt;
+# CONFIG_EXT3_FS is not set                   &lt;
+CONFIG_EXT4_USE_FOR_EXT2=y                    &lt;
+CONFIG_VFAT_FS=y                        CONFIG_VFAT_FS=y
+# CONFIG_NTFS_FS is not set
+</pre></div>
+</div>
+<ul class="simple">
+<li>So we have now configured the kernel. Mostly we have changed some of the file system related settings and not made much changes. We will now start with the compilation.</li>
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">-j</span> <span class="pre">4</span></code> - this will start the compilation of the linux kernel. <code class="docutils literal"><span class="pre">-j</span></code> option runs the <code class="docutils literal"><span class="pre">make</span></code> in a multithreaded fashion. <code class="docutils literal"><span class="pre">4</span></code> here stands for the number of threads. For selecting the number of threads you can see the number of cores in your virtual machine. The file <code class="docutils literal"><span class="pre">/proc/cpuinfo</span></code> has the information about cpus. Generally its a good idea to have 2 threads per cpu. i.e for a 2 cpu machine have 4 threads. You can keep more threads per cpu.</li>
+<li>Errors I faced - this was due to the openssl library missing from the system. It can be installed by the command <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libssl-dev</span></code>. Install the package and restart the compilation process.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ make -j 4
+
+scripts/kconfig/conf  --silentoldconfig Kconfig
+  SYSHDR  arch/x86/entry/syscalls/../../include/generated/asm/unistd_32_ia32.h
+  SYSTBL  arch/x86/entry/syscalls/../../include/generated/asm/syscalls_32.h
+  CHK     include/config/kernel.release
+  SYSHDR  arch/x86/entry/syscalls/../../include/generated/asm/unistd_64_x32.h
+
+  &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt; SNIPPED &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+
+  HOSTCC  scripts/selinux/genheaders/genheaders
+  HOSTCC  scripts/selinux/mdp/mdp
+  HOSTCC  scripts/kallsyms
+  HOSTLD  scripts/mod/modpost
+  HOSTCC  scripts/conmakehash
+  HOSTCC  scripts/recordmcount
+  HOSTCC  scripts/sortextable
+  HOSTCC  scripts/asn1_compiler
+  HOSTCC  scripts/sign-file
+
+
+scripts/sign-file.c:25:30: fatal error: openssl/opensslv.h: No such file or directory
+
+
+
+compilation terminated.
+scripts/Makefile.host:91: recipe for target &#39;scripts/sign-file&#39; failed
+make[1]: *** [scripts/sign-file] Error 1
+make[1]: *** Waiting for unfinished jobs....
+Makefile:558: recipe for target &#39;scripts&#39; failed
+make: *** [scripts] Error 2
+make: *** Waiting for unfinished jobs....
+make: *** wait: No child processes.  Stop.
+</pre></div>
+</div>
+<ul class="simple">
+<li>I started with <code class="docutils literal"><span class="pre">make</span> <span class="pre">-j</span> <span class="pre">4</span></code> and saw that the processor is still underutilised. Hence I started the 16 threads with <code class="docutils literal"><span class="pre">time</span></code> command to see the time taken.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ time make -j 16
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">modules</span></code> - compiles the modules - this step is not required.</li>
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">modules_installs</span></code> - installs (copies) the modules to the required loaction usually <code class="docutils literal"><span class="pre">/lib/modules/KERNEL-VERSION/kernel</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></code> - installs the kernel in the required location usually <code class="docutils literal"><span class="pre">/boot/</span></code>, makes the initial ramfs sets up the boot loader, you are now ready to reboot your system.</li>
+<li>If everything goes fine then your kernel will install properly.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="bootloader">
+<h2>3.4. BootLoader<a class="headerlink" href="#bootloader" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Let us do some settings in grub so that we can see some of the changes.</li>
+<li>Open the file <code class="docutils literal"><span class="pre">/etc/default/grub</span></code> and change the <code class="docutils literal"><span class="pre">GRUB_TIMEOUT</span></code> to 60</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ head /etc/default/grub
+# If you change this file, run &#39;update-grub&#39; afterwards to update
+# /boot/grub/grub.cfg.
+# For full documentation of the options in this file, see:
+#   info -f grub -n &#39;Simple configuration&#39;
+
+GRUB_DEFAULT=-1
+GRUB_HIDDEN_TIMEOUT=
+GRUB_HIDDEN_TIMEOUT_QUIET=true
+GRUB_TIMEOUT=60
+GRUB_DISTRIBUTOR=`lsb_release -i -s 2&gt; /dev/null || echo Debian`
+</pre></div>
+</div>
+<ul class="simple">
+<li>This will ensure that the boot menu waits for 60 seconds before it goes to the default selection.</li>
+<li>Let us check the entries using the <code class="docutils literal"><span class="pre">grub-customizer</span></code> tool. Run the following command and then start the <code class="docutils literal"><span class="pre">grub-customizer</span></code></li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">add</span><span class="o">-</span><span class="n">apt</span><span class="o">-</span><span class="n">repository</span> <span class="n">ppa</span><span class="p">:</span><span class="n">danielrichter2007</span><span class="o">/</span><span class="n">grub</span><span class="o">-</span><span class="n">customizer</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">grub</span><span class="o">-</span><span class="n">customizer</span>
+</pre></div>
+</div>
+<p>Reference for this <a class="reference external" href="http://askubuntu.com/questions/532238/how-do-i-customize-the-grub-2-menu">http://askubuntu.com/questions/532238/how-do-i-customize-the-grub-2-menu</a></p>
+<ul class="simple">
+<li>When I run the tool I can see the following</li>
+</ul>
+<img alt="../_images/04_grub_customizer.png" src="../_images/04_grub_customizer.png" />
+<ul class="simple">
+<li>Do not make any changes, just observe that there are new entries for the 4.7 kernel.</li>
+<li>Now let us reboot the system. Following screen will come.</li>
+</ul>
+<img alt="../_images/05_boot_prompt.png" src="../_images/05_boot_prompt.png" />
+<ul class="simple">
+<li>When you go to the <code class="docutils literal"><span class="pre">Advanced</span> <span class="pre">options</span> <span class="pre">for</span> <span class="pre">Ubuntu</span></code> you can see the following screen. Here you can choose which kernel to boot manually. There are settings in <code class="docutils literal"><span class="pre">grub</span></code> which can enable you in making the default kernel as you want.</li>
+</ul>
+<img alt="../_images/06_select_kernel.png" src="../_images/06_select_kernel.png" />
+<ul class="simple">
+<li>When your new kernel boots up run the command <code class="docutils literal"><span class="pre">uname</span> <span class="pre">-a</span></code> to see the current kernel version.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ uname -a
+Linux rishi-VirtualBox 4.7.0 #1 SMP Sat Aug 20 09:41:02 IST 2016 x86_64 x86_64 x86_64 GNU/Linux
+</pre></div>
+</div>
+<ul class="simple">
+<li>It shows that we are into our new kernel. Congratulations !!!</li>
+</ul>
+</div>
+<div class="section" id="files-of-the-new-kernel">
+<h2>3.5. Files Of The New Kernel<a class="headerlink" href="#files-of-the-new-kernel" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Write this section about important files.</p>
+</div>
+<ul class="simple">
+<li>Let us see some of the important files of the newly installed kernel.</li>
+<li>/boot/initrd.img-4.7.0</li>
+<li>/boot/System.map-4.7.0</li>
+<li>/boot/vmlinuz-4.7.0</li>
+<li>/boot/config-4.7.0</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">diff</span> <span class="o">/</span><span class="n">boot</span><span class="o">/</span><span class="n">config</span><span class="o">-</span><span class="mf">4.7</span><span class="o">.</span><span class="mi">0</span> <span class="o">~/</span><span class="n">lkw</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="mf">4.7</span><span class="o">/.</span><span class="n">config</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">/lib/modules/4.7.0/</span></code></li>
+<li>Symlink</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ls</span> <span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="mf">4.7</span><span class="o">.</span><span class="mi">0</span><span class="o">/</span><span class="n">build</span> <span class="o">-</span><span class="n">l</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span> <span class="mi">25</span> <span class="n">Aug</span> <span class="mi">20</span> <span class="mi">09</span><span class="p">:</span><span class="mi">43</span> <span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="mf">4.7</span><span class="o">.</span><span class="mi">0</span><span class="o">/</span><span class="n">build</span> <span class="o">-&gt;</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">rishi</span><span class="o">/</span><span class="n">lkw</span><span class="o">/</span><span class="n">linux</span><span class="o">-</span><span class="mf">4.7</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>/lib/modules/4.7.0/modules.dep</li>
+<li>/lib/modules/4.7.0/modules.order</li>
+<li>/lib/modules/4.7.0/source</li>
+</ul>
+</div>
+<div class="section" id="module-loading-and-unloading">
+<h2>3.6. Module Loading and Unloading<a class="headerlink" href="#module-loading-and-unloading" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>We had configured the system to have ext2 file system as a module. So the linux system should not show that it supports the file system unless the module is loaded. Right?</li>
+<li>Let us check this fact by listing the supported file systems. <code class="docutils literal"><span class="pre">cat</span></code> the file <code class="docutils literal"><span class="pre">/proc/filesystems</span></code></li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ cat /proc/filesystems
+nodev   sysfs
+nodev   rootfs
+nodev   ramfs
+nodev   bdev
+nodev   proc
+nodev   cpuset
+nodev   cgroup
+nodev   cgroup2
+nodev   tmpfs
+nodev   devtmpfs
+nodev   binfmt_misc
+nodev   debugfs
+nodev   tracefs
+nodev   sockfs
+nodev   pipefs
+nodev   hugetlbfs
+nodev   rpc_pipefs
+nodev   devpts
+        ext3
+        ext4
+        iso9660
+nodev   nfs
+nodev   nfs4
+nodev   autofs
+nodev   mqueue
+nodev   selinuxfs
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We will use some commands like <code class="docutils literal"><span class="pre">modprobe</span></code> <code class="docutils literal"><span class="pre">insmod</span></code> <code class="docutils literal"><span class="pre">lsmod</span></code> <code class="docutils literal"><span class="pre">rmmod</span></code>. Do not worry if you are unable to understand these. In the next chapters I will detail them.</p>
+</div>
+<ul class="simple">
+<li>Let us load the <code class="docutils literal"><span class="pre">ext2</span></code> file system in the kernel and see what happens. We can do this by the <code class="docutils literal"><span class="pre">modprobe</span></code> command. <code class="docutils literal"><span class="pre">modprobe</span></code> is an intelligent tool which knows the exact locations of the modules and it can load them from there. We should do it as <code class="docutils literal"><span class="pre">sudo</span></code> as we need the <code class="docutils literal"><span class="pre">root</span></code> priviledges. The other tool to insert modules is <code class="docutils literal"><span class="pre">insmod</span></code>.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ sudo modprobe ext2
+[sudo] password for rishi:
+</pre></div>
+</div>
+<ul class="simple">
+<li>We can check if the module got loaded by running the <code class="docutils literal"><span class="pre">lsmod</span></code> command. The second column of the <code class="docutils literal"><span class="pre">lsmod</span></code> command is the usage count. Right now there is no ext2 filesystem which is mounted hence the usage count is <code class="docutils literal"><span class="pre">0</span></code>.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ lsmod | grep ext2
+ext2                   50017  0
+</pre></div>
+</div>
+<ul class="simple">
+<li>We should now be supporing the <code class="docutils literal"><span class="pre">ext2</span></code> file system as well. See the last line. You can see the <code class="docutils literal"><span class="pre">ext2</span></code> file system being supported.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ cat /proc/filesystems
+nodev   sysfs
+nodev   rootfs
+nodev   ramfs
+nodev   bdev
+nodev   proc
+nodev   cpuset
+nodev   cgroup
+nodev   cgroup2
+nodev   tmpfs
+nodev   devtmpfs
+nodev   binfmt_misc
+nodev   debugfs
+nodev   tracefs
+nodev   sockfs
+nodev   pipefs
+nodev   hugetlbfs
+nodev   rpc_pipefs
+nodev   devpts
+        ext3
+        ext4
+        iso9660
+nodev   nfs
+nodev   nfs4
+nodev   autofs
+nodev   mqueue
+nodev   selinuxfs
+        ext2
+</pre></div>
+</div>
+<ul class="simple">
+<li>Let us now remove the <code class="docutils literal"><span class="pre">ext2</span></code> module. Use the command <code class="docutils literal"><span class="pre">rmmod</span></code>.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ sudo rmmod ext2
+</pre></div>
+</div>
+<ul class="simple">
+<li>Now there will be no entry in <code class="docutils literal"><span class="pre">lsmod</span></code> for the <code class="docutils literal"><span class="pre">ext2</span></code> file system.</li>
+</ul>
+</div>
+<div class="section" id="automatic-loading-of-modules-when-required">
+<h2>3.7. Automatic Loading of modules when required.<a class="headerlink" href="#automatic-loading-of-modules-when-required" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>We will now <code class="docutils literal"><span class="pre">mount</span></code> a file system of type <code class="docutils literal"><span class="pre">ext2</span></code> and we will see that the module gets loaded automaticllay.</li>
+<li>First let us see the currently mounted file systems.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ mount
+sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,relatime)
+proc on /proc type proc (rw,nosuid,nodev,noexec,relatime)
+udev on /dev type devtmpfs (rw,nosuid,relatime,size=1042368k,nr_inodes=260592,mode=755)
+devpts on /dev/pts type devpts (rw,nosuid,noexec,relatime,gid=5,mode=620,ptmxmode=000)
+tmpfs on /run type tmpfs (rw,nosuid,noexec,relatime,size=209632k,mode=755)
+/dev/sda1 on / type ext4 (rw,relatime,errors=remount-ro,data=ordered)
+selinuxfs on /sys/fs/selinux type selinuxfs (rw,relatime)
+tmpfs on /dev/shm type tmpfs (rw,nosuid,nodev)
+tmpfs on /run/lock type tmpfs (rw,nosuid,nodev,noexec,relatime,size=5120k)
+tmpfs on /sys/fs/cgroup type tmpfs (ro,nosuid,nodev,noexec,mode=755)
+cgroup on /sys/fs/cgroup/systemd type cgroup (rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/lib/systemd/systemd-cgroups-agent,name=systemd)
+cgroup on /sys/fs/cgroup/freezer type cgroup (rw,nosuid,nodev,noexec,relatime,freezer)
+cgroup on /sys/fs/cgroup/cpu,cpuacct type cgroup (rw,nosuid,nodev,noexec,relatime,cpu,cpuacct)
+cgroup on /sys/fs/cgroup/cpuset type cgroup (rw,nosuid,nodev,noexec,relatime,cpuset)
+systemd-1 on /proc/sys/fs/binfmt_misc type autofs (rw,relatime,fd=34,pgrp=1,timeout=0,minproto=5,maxproto=5,direct)
+mqueue on /dev/mqueue type mqueue (rw,relatime)
+hugetlbfs on /dev/hugepages type hugetlbfs (rw,relatime)
+debugfs on /sys/kernel/debug type debugfs (rw,relatime)
+tmpfs on /run/user/108 type tmpfs (rw,nosuid,nodev,relatime,size=209632k,mode=700,uid=108,gid=114)
+tmpfs on /run/user/1000 type tmpfs (rw,nosuid,nodev,relatime,size=209632k,mode=700,uid=1000,gid=1000)
+</pre></div>
+</div>
+<ul class="simple">
+<li>Now let us create a file which we will use as a disk for making an <code class="docutils literal"><span class="pre">ext2</span></code> partition.</li>
+<li><code class="docutils literal"><span class="pre">dd</span></code> command will help us in this. We will make a 100MB file. Here <code class="docutils literal"><span class="pre">if</span></code> is the input file name. <code class="docutils literal"><span class="pre">/dev/zero</span></code> is a device which gives zeros when it is read. Read more about it. <code class="docutils literal"><span class="pre">of</span></code> is the output filename. <code class="docutils literal"><span class="pre">bs</span></code> is the blocksize and <code class="docutils literal"><span class="pre">count</span></code> is the number of blocks we want it to write. <code class="docutils literal"><span class="pre">bs*count</span></code> is the size of the file made.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ dd if=/dev/zero of=100mb bs=1M count=100
+100+0 records in
+100+0 records out
+104857600 bytes (105 MB, 100 MiB) copied, 0.0596335 s, 1.8 GB/s
+</pre></div>
+</div>
+<ul class="simple">
+<li>Let us make a file system now.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ mkfs.ext2 100mb
+mke2fs 1.42.13 (17-May-2015)
+Discarding device blocks: done
+Creating filesystem with 102400 1k blocks and 25688 inodes
+Filesystem UUID: acc67a5c-572f-4e83-b0cc-f9a53cbb9f0f
+Superblock backups stored on blocks:
+    8193, 24577, 40961, 57345, 73729
+
+Allocating group tables: done
+Writing inode tables: done
+Writing superblocks and filesystem accounting information: done
+</pre></div>
+</div>
+<ul class="simple">
+<li>Associate it with a <code class="docutils literal"><span class="pre">loop</span></code> device. Loop devices are fake devices which allow regular files to be used as block devices. Read about them in <code class="docutils literal"><span class="pre">man</span> <span class="pre">losetup</span></code>.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ sudo losetup /dev/loop0 100mb
+</pre></div>
+</div>
+<ul class="simple">
+<li>Current status of <code class="docutils literal"><span class="pre">ext2</span></code> module</li>
+<li>Mounting the <code class="docutils literal"><span class="pre">ext2</span></code> filesystem we just made.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ sudo mount /dev/loop0 /mnt
+</pre></div>
+</div>
+<ul class="simple">
+<li>Now the state of <code class="docutils literal"><span class="pre">ext2</span></code> module. The usage count is 1 here.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ lsmod | grep ext2
+ext2                   50017  1
+</pre></div>
+</div>
+<ul class="simple">
+<li>Status of <code class="docutils literal"><span class="pre">mount</span></code> command.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ mount | grep ext2
+/dev/loop0 on /mnt type ext2 (rw,relatime,errors=continue)
+</pre></div>
+</div>
+<ul class="simple">
+<li>Status of <code class="docutils literal"><span class="pre">/proc/filesystems</span></code></li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ cat /proc/filesystems
+nodev   sysfs
+nodev   rootfs
+nodev   ramfs
+nodev   bdev
+nodev   proc
+nodev   cpuset
+nodev   cgroup
+nodev   cgroup2
+nodev   tmpfs
+nodev   devtmpfs
+nodev   binfmt_misc
+nodev   debugfs
+nodev   tracefs
+nodev   sockfs
+nodev   pipefs
+nodev   hugetlbfs
+nodev   rpc_pipefs
+nodev   devpts
+        ext3
+        ext4
+        iso9660
+nodev   nfs
+nodev   nfs4
+nodev   autofs
+nodev   mqueue
+nodev   selinuxfs
+        ext2
+</pre></div>
+</div>
+<ul class="simple">
+<li>Unmounting the file system.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ sudo umount /mnt
+</pre></div>
+</div>
+<ul class="simple">
+<li>The module does not get unloaded by itself. Its usage count gets to 0 though.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ lsmod | grep ext2
+ext2                   50017  0
+</pre></div>
+</div>
+<ul class="simple">
+<li>We can now remove it ourselves.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ sudo rmmod  ext2
+</pre></div>
+</div>
+<ul class="simple">
+<li>We can check the supported file systems again. There is not <code class="docutils literal"><span class="pre">ext2</span></code></li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>rishi@rishi-VirtualBox:~$ cat /proc/filesystems
+nodev   sysfs
+nodev   rootfs
+nodev   ramfs
+nodev   bdev
+nodev   proc
+nodev   cpuset
+nodev   cgroup
+nodev   cgroup2
+nodev   tmpfs
+nodev   devtmpfs
+nodev   binfmt_misc
+nodev   debugfs
+nodev   tracefs
+nodev   sockfs
+nodev   pipefs
+nodev   hugetlbfs
+nodev   rpc_pipefs
+nodev   devpts
+        ext3
+        ext4
+        iso9660
+nodev   nfs
+nodev   nfs4
+nodev   autofs
+nodev   mqueue
+nodev   selinuxfs
+</pre></div>
+</div>
+</div>
+<div class="section" id="exercises">
+<h2>3.8. Exercises<a class="headerlink" href="#exercises" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Build the XFS file system in the kernel. See the effect in the file <code class="docutils literal"><span class="pre">/proc/filesystems</span></code></li>
+<li>Build the <code class="docutils literal"><span class="pre">reiserfs</span></code> file system as module. See the effect in the file <code class="docutils literal"><span class="pre">/proc/filesystems</span></code>. See the new <code class="docutils literal"><span class="pre">.config</span></code> file which got generated.</li>
+<li>Make some files and associate them with different loop devices. Mount them, do some operations.</li>
+</ul>
+</div>
+<div class="section" id="references">
+<h2>3.9. References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The Design Of Unix Operating System.</li>
+<li><code class="docutils literal"><span class="pre">man</span></code> pages are the best references you will find for Linux. Read the <code class="docutils literal"><span class="pre">man</span></code> pages for <code class="docutils literal"><span class="pre">dd</span></code>, <code class="docutils literal"><span class="pre">mkfs.ext2</span></code>, <code class="docutils literal"><span class="pre">mount</span></code>, <code class="docutils literal"><span class="pre">modprobe</span></code>. Do not worry about understanding them end to end, just read it. We will detail them in coming chapters or documents.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinxlocaltoc">
+    <h3><a href="../wip.index.html">Page contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">3. Kernel Compilation</a><ul>
+<li><a class="reference internal" href="#introduction">3.1. Introduction</a><ul>
+<li><a class="reference internal" href="#why-this-chapter">3.1.1. Why this chapter</a></li>
+<li><a class="reference internal" href="#what-will-you-learn">3.1.2. What will you learn</a></li>
+<li><a class="reference internal" href="#prerequisites">3.1.3. Prerequisites</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#linux-kernel">3.2. Linux Kernel</a></li>
+<li><a class="reference internal" href="#id1">3.3. Kernel Compilation</a><ul>
+<li><a class="reference internal" href="#compiling-a-kernel-steps">3.3.1. Compiling a Kernel - Steps</a></li>
+<li><a class="reference internal" href="#hands-on-compling-a-kernel">3.3.2. Hands-On Compling a Kernel</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bootloader">3.4. BootLoader</a></li>
+<li><a class="reference internal" href="#files-of-the-new-kernel">3.5. Files Of The New Kernel</a></li>
+<li><a class="reference internal" href="#module-loading-and-unloading">3.6. Module Loading and Unloading</a></li>
+<li><a class="reference internal" href="#automatic-loading-of-modules-when-required">3.7. Automatic Loading of modules when required.</a></li>
+<li><a class="reference internal" href="#exercises">3.8. Exercises</a></li>
+<li><a class="reference internal" href="#references">3.9. References</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div class="sphinxprev">
+    <h4>Previous page</h4>
+    <p class="topless"><a href="01_setting_up.html"
+                          title="Previous page">&larr; 2. Setting Up</a></p>
+  </div>
+  <div class="sphinxnext">
+    <h4>Next page</h4>
+    <p class="topless"><a href="03_kernel_modules.html"
+                          title="Next page">&rarr; 4. Kernel Modules</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/doc/02_kernel_compilation.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="03_kernel_modules.html" title="4. Kernel Modules"
+             >next</a> &nbsp; &nbsp;</li>
+        <li class="right" >
+          <a href="01_setting_up.html" title="2. Setting Up"
+             >previous</a> &nbsp; &nbsp;</li>
+    <li><a href="../index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Rishi Agrawal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>
