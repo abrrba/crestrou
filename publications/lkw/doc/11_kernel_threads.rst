@@ -1,6 +1,9 @@
+##############
+Kernel Threads
+##############
 
-=======
-Authors
-=======
+For a linked list's print function. create a kernel thread.
 
-*   Rishi Agrawal <rishi.b.agrawal@gmail.com>
+For adding as well create a kernel thread.
+
+For deleting as well create a kernel thread.

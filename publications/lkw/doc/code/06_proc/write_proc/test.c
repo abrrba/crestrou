@@ -9,8 +9,8 @@
 
 int main () {
 
-    int fd = open (PROC_FULL_PATH, O_RDONLY);
-    char buf[LEN];
+    int fd = open (PROC_FULL_PATH, O_RDWR);
+    char buf[LEN] = "Hey People";
     int retval;
 
     if (fd < 0) {
@@ -18,18 +18,10 @@ int main () {
         fprintf(stderr, "Make sure that the myproc module is loaded");
     }
 
-    retval = read(fd, buf, LEN);
-
-    printf("\nData Read is %s", buf);
-    printf("\nBytes Read is %d", retval);
+    retval = write(fd, buf, 11);
 
     close(fd);
 
-    printf("\nThis open should fail because of the permissons we set in the code");
-    fd = open (PROC_FULL_PATH, O_RDWR);
-    if (fd < 0) {
-        perror("myproc_test: ");
-    }
 
     return 0;
 }

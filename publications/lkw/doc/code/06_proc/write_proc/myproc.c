@@ -16,21 +16,45 @@
 struct proc_dir_entry *proc;
 int len;
 char *msg = NULL;
+#define DATA_SIZE 1024 // We can keep 1024 bytes of data with us.
 
+/*
+ * Function to write to the proc. Here we free the old data, and allocate new space and copy the data to 
+ * that newly allocated area.
+ */
 
-static ssize_t my_proc_write(struct file *file, const char __user * buffer, size_t count, loff_t *pos)
+static ssize_t my_proc_write(struct file *filp, const char __user * buffer, size_t count, loff_t *pos)
 {
-    printk(KERN_INFO "Writing to proc");
+    int i;
+    char *data = PDE_DATA(file_inode(filp));
 
-    if (msg != NULL) {
-        kfree(msg);
-    }
-    msg = kmalloc((size_t) count, GFP_KERNEL);
-    if (copy_from_user(msg, buffer, count)) {
+    if (count > DATA_SIZE) {
         return -EFAULT;
     }
+
+    printk(KERN_INFO "Printing the data passed.");
+    
+    for (i=0; i < count; i++) {
+        printk(KERN_INFO "%d . %c", i, buffer[i]);
+    }
+
+    printk(KERN_INFO "Writing to proc");
+
+
+    if (copy_from_user(data, buffer, count)) {
+        return -EFAULT;
+    }
+
     printk(KERN_INFO "msg has been set to %s", msg);
-    return 10;
+    printk(KERN_INFO "Message is ");
+    
+    for (i=0; i < count; i++) {
+        printk(KERN_INFO "\n %d . %c", i, msg[i]);
+    }
+    *pos = (int) count;
+    len = count;
+
+    return count;
 }
 
 ssize_t read_proc(struct file *filp,char *buf,size_t count, loff_t *offp ) 
@@ -70,13 +94,14 @@ ssize_t read_proc(struct file *filp,char *buf,size_t count, loff_t *offp )
 
 struct file_operations proc_fops = {
     .read = read_proc,
+    .write = my_proc_write,
 };
 
 int create_new_proc_entry(void) {
     int i;
     char *DATA = "Hello People";
     len = strlen(DATA);
-    msg = kmalloc((size_t) (len + 1), GFP_KERNEL); // +1 for \0
+    msg = kmalloc((size_t) DATA_SIZE, GFP_KERNEL); // +1 for \0
     
     if (msg != NULL) {
         printk(KERN_INFO "Allocated memory for msg");
@@ -91,10 +116,11 @@ int create_new_proc_entry(void) {
             printk(KERN_INFO "YES");
         }
     }
-    proc = proc_create_data(MY_PROC_ENTRY, 0, NULL, &proc_fops, msg);
+    proc = proc_create_data(MY_PROC_ENTRY, 0666, NULL, &proc_fops, msg);
     if (proc) {
         return 0;
     }
+    return -1;
 }
 
 int proc_init (void) {

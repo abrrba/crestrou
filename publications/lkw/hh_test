@@ -7,4 +7,4 @@
 #make --makefile=testFiles/test.Makefile html
 make clean
 sphinx-build -b html -d _build/doctrees   . _build/html -D master_doc=wip.index
-google-chrome _build/html/wip.index.html &
+google-chrome _build/html/index.html &

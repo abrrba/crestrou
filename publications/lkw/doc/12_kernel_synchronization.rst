@@ -1,6 +1,5 @@
+######################
+kernel_synchronization
+######################
 
-=======
-Authors
-=======
-
-*   Rishi Agrawal <rishi.b.agrawal@gmail.com>
+The right way to add nodes to the linked list is to add it using some locks. We will see the locks now.

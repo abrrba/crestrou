@@ -17,6 +17,18 @@ int len;
 char *msg;
 
 int bytes_read;
+
+/*
+ * Here you have the find the data where we have stored the related information
+ * and then copy the data to the user space buffer which is passed by the read
+ * system call.
+ *
+ * We also need to update the offset to the amount of data read.
+ *
+ * Read system call should also return the amount of data read, which should be
+ * less than or equal to count but not be more than the count.
+ */
+
 ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp) 
 {
     int err;
@@ -49,9 +61,19 @@ ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp)
     return count;
 }
 
+/*
+ * Operations for the reading the proc entry. When we will implement write 
+ * we will add the function for writing as well.
+ */
+
 struct file_operations proc_fops = {
     .read = read_proc,
 };
+
+
+/*
+ * Function to create the entry.
+ */
 
 void create_new_proc_entry(void) {
     msg = "Hello World";
@@ -71,4 +93,3 @@ void proc_cleanup(void) {
 MODULE_LICENSE("GPL"); 
 module_init(proc_init);
 module_exit(proc_cleanup);
-

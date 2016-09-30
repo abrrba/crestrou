@@ -65,9 +65,3 @@ The script below will help you in this.
 .. literalinclude:: code/01_setting_up/install_packages.sh
     :language: bash
     :linenos:
-
-=======
-Authors
-=======
-
-*   Rishi Agrawal <rishi.b.agrawal@gmail.com>

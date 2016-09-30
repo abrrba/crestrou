@@ -14,10 +14,16 @@ kernel_clean:
 
 clean: kernel_clean
 	rm -rf   Module.symvers modules.order
+	rm e_read_proc
+
 
 insert: modules 
 	sudo insmod myproc.ko
 
 remove:
 	sudo rmmod myproc
+	sudo dmesg -c
         
+test:
+	gcc read_proc.c -o e_read_proc
+	./e_read_proc
