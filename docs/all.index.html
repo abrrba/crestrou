@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DRAFT Linux Kernel Workbook &#8212; Linux Kernel Workbook 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="_static/cloud.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+    <li><a href="index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="draft-linux-kernel-workbook">
+<h1>DRAFT Linux Kernel Workbook<a class="headerlink" href="#draft-linux-kernel-workbook" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="doc/00_about_the_book.html">1.  About The Book</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/00_about_the_book.html#introduction">1.1. Introduction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/01_setting_up.html">2.  Setting Up</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/01_setting_up.html#introduction">2.1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/01_setting_up.html#steps">2.2. Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/01_setting_up.html#why-a-virtual-machine">2.3. Why a Virtual Machine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/01_setting_up.html#install-packages">2.4. Install Packages</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/02_kernel_compilation.html">3.  Kernel Compilation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#introduction">3.1. Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/02_kernel_compilation.html#why-this-chapter">3.1.1. Why this chapter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/02_kernel_compilation.html#what-will-you-learn">3.1.2. What will you learn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/02_kernel_compilation.html#prerequisites">3.1.3. Prerequisites</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#linux-kernel">3.2. Linux Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#id1">3.3. Kernel Compilation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/02_kernel_compilation.html#compiling-a-kernel-steps">3.3.1. Compiling a Kernel - Steps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/02_kernel_compilation.html#hands-on-compling-a-kernel">3.3.2. Hands-On Compling a Kernel</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#bootloader">3.4. BootLoader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#files-of-the-new-kernel">3.5. Files Of The New Kernel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#module-loading-and-unloading">3.6. Module Loading and Unloading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#automatic-loading-of-modules-when-required">3.7. Automatic Loading of modules when required.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#exercises">3.8. Exercises</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_kernel_compilation.html#references">3.9. References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/03_kernel_modules.html">4.  Kernel Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#introduction">4.1. Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#why-this-chapter">4.1.1. Why this chapter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#what-will-you-learn">4.1.2. What will you learn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#concepts-and-keywords-involved">4.1.3. Concepts and Keywords involved</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#prerequisites">4.1.4. Prerequisites</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#what-are-kernel-modules">4.2. What are Kernel Modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#kernel-module-advantages">4.3. Kernel Module Advantages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#tools-for-kernel-modules">4.4. Tools for Kernel Modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#insmod">4.4.1. <code class="docutils literal"><span class="pre">insmod</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#modprobe">4.4.2. <code class="docutils literal"><span class="pre">modprobe</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#rmmod">4.4.3. <code class="docutils literal"><span class="pre">rmmod</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#lsmod">4.4.4. <code class="docutils literal"><span class="pre">lsmod</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#modinfo">4.4.5. <code class="docutils literal"><span class="pre">modinfo</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#dmesg">4.4.6. <code class="docutils literal"><span class="pre">dmesg</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#syslog">4.4.7. <code class="docutils literal"><span class="pre">syslog</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#some-system-calls">4.4.8. Some System Calls</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#new-functions">4.5. New Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#printk">4.5.1. <code class="docutils literal"><span class="pre">printk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#module-init">4.5.2. <code class="docutils literal"><span class="pre">module_init()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#module-exit">4.5.3. <code class="docutils literal"><span class="pre">module_exit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#hello-world-kernel-module">4.6. Hello World Kernel Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id1">4.6.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#code">4.6.2. Code</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#file-mymodule-c">4.6.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule.c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#file-makefile">4.6.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#common-questions">4.6.3. Common Questions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#how-to-run-the-code">4.6.3.1. How to run the code</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#how-the-code-gets-executed">4.6.3.2. How the code gets executed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#how-to-remove-the-module">4.6.3.3. How to remove the module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#how-the-module-gets-removed-unloaded">4.6.3.4. How the module gets removed/unloaded</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#module-which-does-some-calculations">4.7. Module Which Does Some Calculations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id2">4.7.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id3">4.7.2. Code</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#file-mycalc-c">4.7.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mycalc.c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#id4">4.7.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#module-with-parameters">4.8. Module with Parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id5">4.8.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id6">4.8.2. Code</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#file-mymodule-with-parameters-c">4.8.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule_with_parameters.c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#id7">4.8.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#module-with-character-array-and-arrays-as-parameters">4.9. Module with Character Array and Arrays as parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id8">4.9.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#questions">4.9.2. Questions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id9">4.9.3. Code</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#id10">4.9.3.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule_with_parameters.c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#id11">4.9.3.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#calculator-with-parameters">4.10. Calculator with parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id12">4.10.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/03_kernel_modules.html#id13">4.10.2. Code</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#file-mycalc-with-parameters-c">4.10.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mycalc_with_parameters.c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/03_kernel_modules.html#id14">4.10.2.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#conclusion">4.11. Conclusion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_kernel_modules.html#references">4.12. References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/04_exporting_symbols.html">5.  Exporting Symbols</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#introduction">5.1. Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#why-this-chapter">5.1.1. Why this chapter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#what-will-you-learn">5.1.2. What will you learn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#prerequisites">5.1.3. Prerequisites</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#id1">5.2. Export Symbol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#module-exporting-some-functions-and-variables">5.3. Module Exporting Some Functions and Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#id2">5.3.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#file-mymodule1-c">5.3.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule1.c</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#file-mymodule2-c">5.3.3. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mymodule2.c</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#file-makefile">5.3.4. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#removing-the-modules">5.4. Removing the modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#other-files">5.5. Other files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#see-the-exported-symbols">5.6. See the exported symbols</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#tool-modprobe">5.7. Tool modprobe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#tool-depmod">5.8. Tool - depmod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#one-module-dependent-on-several-modules">5.9. One module dependent on several modules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#modprobe-automatically-loading-all-the-modules">5.9.1. <code class="docutils literal"><span class="pre">modprobe</span></code> automatically loading all the modules.</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#string-related-functions-available-in-kernel">5.10. String related functions available in kernel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#file-mystring-c">5.10.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">mystring.c</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/04_exporting_symbols.html#id3">5.10.2. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_exporting_symbols.html#exercises">5.11. Exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/05_kernel_bug_reporting.html">1.  Kernel Bug Reporting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/05_kernel_bug_reporting.html#bug-bug-on-dump-stack-panic-example">1.1. BUG(), BUG_ON(), dump_stack(), panic() example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/05_kernel_bug_reporting.html#file-proc-c">1.1.1. <code class="docutils literal"><span class="pre">file</span></code>: proc.c</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/05_kernel_bug_reporting.html#file-makefile">1.1.2. <code class="docutils literal"><span class="pre">file</span></code>: Makefile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/06_proc_interface.html">2.  Proc Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#introduction">2.1. Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#why-this-chapter">2.1.1. Why this chapter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#what-will-you-learn">2.1.2. What will you learn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#concepts-and-keywords-involved">2.1.3. Concepts and Keywords involved</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#prerequisites">2.1.4. Prerequisites</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#new-functions">2.2. New Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#kmalloc">2.2.1. <code class="docutils literal"><span class="pre">kmalloc()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#a-simple-only-read-proc-entry">2.3. A Simple Only Read Proc Entry</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id1">2.3.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#code">2.3.2. Code</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/06_proc_interface.html#file-myproc-c">2.3.2.1. <code class="docutils literal"><span class="pre">FILE:</span> <span class="pre">myproc.c</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/06_proc_interface.html#file-makefile">2.3.2.2. <code class="docutils literal"><span class="pre">FILE</span> <span class="pre">:</span> <span class="pre">Makefile</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#proc-directory-with-multiple-entries">2.4. Proc Directory with Multiple Entries</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id2">2.4.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id3">2.4.2. Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#make-a-proc-entry-and-based-on-value-written-to-the-file-call-different-functions">2.5. Make a proc entry and based on value written to the file call different functions.</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id4">2.5.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id5">2.5.2. Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#id6">2.6. Make a proc entry and based on value written to the file call different functions.</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id7">2.6.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id8">2.6.2. Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#module-to-write-a-command-line-calculator">2.7. Module to write a command line calculator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id9">2.7.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id10">2.7.2. Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="doc/06_proc_interface.html#module-to-display-some-system-information-using-the-seq-file-interface">2.8. Module to display some system information using the seq_file interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id11">2.8.1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#id12">2.8.2. Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/06_proc_interface.html#references">2.8.3. References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/07_kernel_data_stuctures.html">3.  Kernel Data Structures</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/07_kernel_data_stuctures.html#using-kernel-s-linked-list-for-your-data-structure">3.1. Using Kernel&#8217;s linked list for your data structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/07_kernel_data_stuctures.html#file-ll-c">3.1.1. <code class="docutils literal"><span class="pre">file</span></code>: ll.c</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/07_kernel_data_stuctures.html#file-module-c">3.1.2. <code class="docutils literal"><span class="pre">file</span></code>: module.c</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/07_kernel_data_stuctures.html#file-proc-c">3.1.3. <code class="docutils literal"><span class="pre">file</span></code>: proc.c</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/07_kernel_data_stuctures.html#file-makefile">3.1.4. <code class="docutils literal"><span class="pre">file</span></code>: Makefile</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="doc/07_kernel_data_stuctures.html#redblack-tree">3.1.4.1. RedBlack Tree</a></li>
+<li class="toctree-l4"><a class="reference internal" href="doc/07_kernel_data_stuctures.html#radix-tree">3.1.4.2. Radix Tree</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/09_making_changes_to_kernel.html">4.  Making Changes to Kernel</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/09_making_changes_to_kernel.html#hands-on-making-changes-to-a-small-module">4.1. Hands-On - Making changes to a small module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/09_making_changes_to_kernel.html#hands-on-making-changes-to-a-code-which-effects-the-whole-kernel">4.2. Hands-On - Making changes to a code which effects the whole kernel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/10_device_drivers.html">5.  Charater Device Drivers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/10_device_drivers.html#device-drivers-types">5.1. Device Drivers Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/10_device_drivers.html#copy-to-user-copy-from-user">5.2. copy_to_user(), copy_from_user()</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/10_device_drivers.html#character-device-driver-and-ioctls">5.3. Character Device driver and ioctls</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="doc/10_device_drivers.html#file-chardev-c">5.3.1. <code class="docutils literal"><span class="pre">file</span></code>: chardev.c</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/10_device_drivers.html#file-makefile">5.3.2. <code class="docutils literal"><span class="pre">file</span></code>: Makefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/10_device_drivers.html#file-ioctl-c">5.3.3. <code class="docutils literal"><span class="pre">file</span></code>: ioctl.c</a></li>
+<li class="toctree-l3"><a class="reference internal" href="doc/10_device_drivers.html#steps">5.3.4. Steps:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/11_kernel_threads.html">6.  Kernel Threads</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/12_kernel_synchronization.html">7.  Kernel Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/08_kernel_assignments.html">8.  Some Questions</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinx-toc sphinxlocaltoc">
+    <h3><a href="wip.index.html">Page contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">DRAFT Linux Kernel Workbook</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/all.index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+    <li><a href="index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Rishi Agrawal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>

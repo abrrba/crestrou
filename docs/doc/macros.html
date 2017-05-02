@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Macros and Functions &#8212; Linux Kernel Workbook 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cloud.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noticia+Text|Open+Sans|Droid+Sans+Mono" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/jquery.cookie.js"></script>
+    <script type="text/javascript" src="../_static/cloud.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body role="document">
+    <div class="relbar-top">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+    <li><a href="../index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="macros-and-functions">
+<h1>Macros and Functions<a class="headerlink" href="#macros-and-functions" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>You will see a lot of functionality available in the kernel space. Some are in the form of macros and inline functions while some are in the form of exported function.</li>
+<li>The functions which are provided as macros</li>
+<li>Let us now look at some of the functionality which is present due to macros.</li>
+<li>The kernel gives a very good interface for you to use a bitmap.</li>
+<li>See the Macros in the file <code class="docutils literal"><span class="pre">asm/bitops.h</span></code></li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>set_bit(bit, addr)                   *addr |= bit
+clear_bit(bit, addr)                 *addr &amp;= ~bit
+change_bit(bit, addr)                *addr ^= bit
+test_bit(bit, addr)                  Is bit set in *addr?
+test_and_set_bit(bit, addr)          Set bit and return old value
+test_and_clear_bit(bit, addr)        Clear bit and return old value
+test_and_change_bit(bit, addr)       Change bit and return old value
+find_first_zero_bit(addr, nbits)     Position first zero bit in *addr
+find_first_bit(addr, nbits)          Position first set bit in *addr
+find_next_zero_bit(addr, nbits, bit) Position next zero bit in *addr &gt;= bit
+find_next_bit(addr, nbits, bit)      Position next set bit in *addr &gt;= bit
+</pre></div>
+</div>
+<ul class="simple">
+<li>These are not functions, hence you will not see them in the <code class="docutils literal"><span class="pre">/proc/kallsyms</span></code></li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cat /proc/kallsyms | grep &quot;clear_bit\|set_bit&quot; -w
+$ echo $?
+1
+</pre></div>
+</div>
+<p>While you can see the string related functions being available.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cat /proc/kallsyms | grep &quot;strcat\|strcmp&quot;
+0000000000000000 T strcat
+0000000000000000 T strcmp
+</pre></div>
+</div>
+<ul class="simple">
+<li>As these are macros we can see them expanded after preprocessing. Do the following for stopping the module compilation just after preprocessing.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>KERNEL_SOURCE=&quot;/home/rishi/lkw/linux-4.7/&quot;
+gcc -E mybitmap.c -I${KERNEL_SOURCE}/include -I${KERNEL_SOURCE}arch/x86/include &gt; PREPROCESSED.c 2&gt;/dev/null
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">I have redirected the errors to <code class="docutils literal"><span class="pre">/dev/null</span></code> as there were some errors coming.</p>
+</div>
+<ul class="simple">
+<li>See the line where we used <code class="docutils literal"><span class="pre">DECLARE_BITMAP</span></code>, it has been changed to in the <code class="docutils literal"><span class="pre">PREPROCESSED.c</span></code> file.</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">unsigned</span> <span class="n">long</span> <span class="n">mybits</span><span class="p">[</span><span class="n">BITS_TO_LONGS</span><span class="p">(</span><span class="mi">40</span><span class="p">)];</span>
+<span class="n">MYBITMAP</span> <span class="o">=</span> <span class="p">(</span><span class="n">void</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">mybits</span><span class="p">;</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>See the line where we call <code class="docutils literal"><span class="pre">test_bit()</span></code> is now converted to</li>
+</ul>
+<div class="highlight-default"><div class="highlight"><pre><span></span>(__builtin_constant_p((i)) ? constant_test_bit((i), (MYBITMAP)) : variable_test_bit((i), (MYBITMAP)))
+</pre></div>
+</div>
+<ul class="simple">
+<li>These are not function calls, but these are macro expantions which do the bitmap related operations for you.</li>
+</ul>
+</div>
+<div class="section" id="example-of-some-bitwise-related-functionality-being-available">
+<h1>Example of some bitwise related functionality being available<a class="headerlink" href="#example-of-some-bitwise-related-functionality-being-available" title="Permalink to this headline">¶</a></h1>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="sphinx-toc sphinxlocaltoc">
+    <h3><a href="../wip.index.html">Page contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Macros and Functions</a></li>
+<li><a class="reference internal" href="#example-of-some-bitwise-related-functionality-being-available">Example of some bitwise related functionality being available</a></li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/doc/macros.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+    
+    
+        <div class="sidebar-toggle-group no-js">
+            
+            <button class="sidebar-toggle" id="sidebar-hide" title="Hide the sidebar menu">
+                 «
+                <span class="show-for-small">hide menu</span>
+                
+            </button>
+            <button class="sidebar-toggle" id="sidebar-show" title="Show the sidebar menu">
+                
+                <span class="show-for-small">menu</span>
+                <span class="hide-for-small">sidebar</span>
+                 »
+            </button>
+        </div>
+    
+      <div class="clearer"></div>
+    </div>
+    <div class="relbar-bottom">
+        
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+    <li><a href="../index.html">Linux Kernel Workbook 1.0 documentation</a> &#187;</li>
+ 
+      </ul>
+    </div>
+    </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2016, Rishi Agrawal.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+    <!-- cloud_sptheme 1.4 -->
+  </body>
+</html>
